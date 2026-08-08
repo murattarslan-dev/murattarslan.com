@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-head">
+  <p class="overline">Hakkımda</p>
+  <h1>Merhaba, ben Murat</h1>
+</section>
+
+<div class="about-grid">
+  <div class="prose about-text">
+    {{ site.about_html }}
+    <p>Bana ulaşmak için: <a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ site.social.github }}" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-ghost" href="{{ site.social.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+  <div class="card skills-card">
+    <h3>Teknolojiler</h3>
+    <ul class="skills">
+      {% for s in site.skills %}<li>{{ s }}</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

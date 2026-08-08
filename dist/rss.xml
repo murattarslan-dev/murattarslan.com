@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Murat Arslan</title>
+  <link>https://murattarslan.com</link>
+  <atom:link href="https://murattarslan.com/rss.xml" rel="self" type="application/rss+xml"/>
+  <description>Murat Arslan — Software Developer. Yazılım, mobil geliştirme ve teknoloji üzerine blog.</description>
+  <language>tr</language>
+  <item>
+    <title>Yeni blog, yeni başlangıç</title>
+    <link>https://murattarslan.com/blog/yeni-blog-yeni-baslangic/</link>
+    <guid>https://murattarslan.com/blog/yeni-blog-yeni-baslangic/</guid>
+    <pubDate>Sat, 08 Aug 2026 09:00:00 +0300</pubDate>
+    <description>murattarslan.com&#x27;u sıfırdan yeniledim — markdown tabanlı statik bir site, Cloudflare Workers üzerinde. İşte nasıl ve neden.</description>
+  </item>
+  <item>
+    <title>Örnek yazı taslağı (bunu düzenle ya da sil)</title>
+    <link>https://murattarslan.com/blog/ornek-yazi-taslagi/</link>
+    <guid>https://murattarslan.com/blog/ornek-yazi-taslagi/</guid>
+    <pubDate>Sat, 01 Aug 2026 09:00:00 +0300</pubDate>
+    <description>Bu bir örnek taslak — markdown formatının nasıl kullanılacağını gösteriyor. Kendi yazınla değiştirebilirsin.</description>
+  </item>
+</channel>
+</rss>

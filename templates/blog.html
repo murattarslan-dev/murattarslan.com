@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-head">
+  <p class="overline">Blog</p>
+  <h1>Yazılar</h1>
+  <p class="lead">Yazılım, teknoloji ve öğrendiklerim üzerine notlar.</p>
+</section>
+
+{% if all_tags %}
+<div class="tags tag-filter">
+  {% for t in all_tags %}<span class="tag">{{ t }}</span>{% endfor %}
+</div>
+{% endif %}
+
+<div class="post-list">
+  {% for p in posts %}
+  <a class="card post-row" href="{{ p.url }}">
+    <div class="post-row-date">{{ p.date_h }}</div>
+    <div class="post-row-main">
+      <h2>{{ p.title }}</h2>
+      <p>{{ p.description }}</p>
+      <div class="tags">{% for t in p.tags %}<span class="tag">{{ t }}</span>{% endfor %}<span class="reading">{{ p.reading }} dk okuma</span></div>
+    </div>
+  </a>
+  {% else %}
+  <p>Henüz yazı yok.</p>
+  {% endfor %}
+</div>
+{% endblock %}

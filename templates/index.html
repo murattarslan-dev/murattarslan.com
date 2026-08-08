@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <p class="overline">{{ site.tagline }}</p>
+    <h1 class="hero-name">Murat Arslan<span class="accent-dot">.</span></h1>
+    <p class="hero-bio">{{ site.bio_short }}</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/blog/">Yazıları oku
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="/hakkimda/">Hakkımda</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="orb"></div>
+    <span class="hero-mono">MA</span>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Son yazılar</h2>
+    <a class="see-all" href="/blog/">Tümünü gör</a>
+  </div>
+  <div class="card-grid">
+    {% for p in posts %}
+    <a class="card post-card" href="{{ p.url }}">
+      <div class="card-meta">{{ p.date_h }} · {{ p.reading }} dk</div>
+      <h3>{{ p.title }}</h3>
+      <p>{{ p.description }}</p>
+      <div class="tags">{% for t in p.tags %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Projeler</h2>
+    <a class="see-all" href="/projeler/">Tümünü gör</a>
+  </div>
+  <div class="card-grid">
+    {% for pr in site.projects[:3] %}
+    <div class="card project-card">
+      <div class="project-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7l-9-5z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>
+      </div>
+      <h3>{{ pr.name }}</h3>
+      <p>{{ pr.description }}</p>
+      <div class="tags">{% for t in pr.tags %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+      {% if pr.link %}<a class="project-link" href="{{ pr.link }}" target="_blank" rel="noopener">İncele ↗</a>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section contact-band">
+  <p class="overline">İletişim</p>
+  <h2>Birlikte çalışalım</h2>
+  <p>Bir fikrin mi var? Soru sormak ya da sadece merhaba demek için yaz.</p>
+  <a class="btn btn-primary" href="mailto:{{ site.email }}">{{ site.email }}</a>
+</section>
+{% endblock %}

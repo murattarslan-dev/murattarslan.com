@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="post">
+  <header class="post-head">
+    <div class="card-meta"><time datetime="{{ post.date_iso }}">{{ post.date_h }}</time> · {{ post.reading }} dk okuma</div>
+    <h1>{{ post.title }}</h1>
+    <div class="tags">{% for t in post.tags %}<span class="tag">#{{ t }}</span>{% endfor %}</div>
+  </header>
+  <div class="prose">
+    {{ post.html }}
+  </div>
+  <footer class="post-footer">
+    <a class="btn btn-ghost" href="/blog/">← Tüm yazılar</a>
+    <p class="post-cta">Sorusu ya da yorumu olan: <a href="mailto:{{ site.email }}">{{ site.email }}</a> 📮</p>
+  </footer>
+</article>
+{% endblock %}

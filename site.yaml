@@ -1,0 +1,42 @@
+title: Murat Arslan
+tagline: Software Developer
+url: https://murattarslan.com
+description: "Murat Arslan — Software Developer. Yazılım, mobil geliştirme ve teknoloji üzerine blog."
+author: Murat Arslan
+email: murattarslan.dev@gmail.com
+lang: tr
+
+social:
+  github: "https://github.com/murattarslan"
+  linkedin: "https://www.linkedin.com/in/murattarslan"
+
+bio_short: "Yazılım geliştiriyorum; öğrendiklerimi ve deneyimlerimi burada yazıyorum."
+
+about: |
+  Merhaba! Ben **Murat**, yazılım geliştiricisiyim. Mobil uygulamalar başta olmak
+  üzere farklı alanlarda ürünler geliştiriyorum.
+
+  Bu blogda öğrendiklerimi, karşılaştığım problemleri ve çözümlerini,
+  denediğim teknolojileri yazıyorum. Amacım hem kendime bir not defteri
+  oluşturmak hem de aynı yoldan geçenlere faydalı olmak.
+
+skills:
+  - Flutter & Dart
+  - Kotlin & Android
+  - REST API & Backend
+  - Git & CI/CD
+  - Cloudflare Workers
+
+projects:
+  - name: Hanio
+    description: "Flutter ile geliştirdiğim mobil uygulama. Modüler mimari, tek palet tema sistemi ve nested routing ile kuruldu."
+    link: ""
+    tags: [Flutter, Dart]
+  - name: murattarslan.com
+    description: "Bu site. Markdown tabanlı, elle yazılmış bir statik site üreteci ile oluşturuluyor ve Cloudflare Workers üzerinde yayınlanıyor."
+    link: "https://murattarslan.com"
+    tags: [Python, Cloudflare]
+  - name: Yeni proje
+    description: "Yakında burada olacak."
+    link: ""
+    tags: [WIP]

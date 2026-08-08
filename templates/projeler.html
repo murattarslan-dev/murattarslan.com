@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-head">
+  <p class="overline">Projeler</p>
+  <h1>Neler yapıyorum</h1>
+  <p class="lead">Geliştirdiğim ve üzerinde çalıştığım projeler.</p>
+</section>
+
+<div class="card-grid">
+  {% for pr in site.projects %}
+  <div class="card project-card">
+    <div class="project-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7l-9-5z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>
+    </div>
+    <h3>{{ pr.name }}</h3>
+    <p>{{ pr.description }}</p>
+    <div class="tags">{% for t in pr.tags %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+    {% if pr.link %}<a class="project-link" href="{{ pr.link }}" target="_blank" rel="noopener">İncele ↗</a>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
