@@ -132,7 +132,7 @@ def main():
     render("projeler.html", "projeler/index.html",
            page={"url": "/projeler/", "title": "Projeler", "description": "Geliştirdiğim projeler"})
     render("404.html", "404.html",
-           page={"url": "/404", "title": "Sayfa bulunamadı", "description": "404"})
+           page={"url": "/404", "title": "Sayfa bulunamadı", "description": "404", "noindex": True})
 
     # --- RSS ---
     items = []
@@ -158,12 +158,14 @@ def main():
 """
     (DIST / "rss.xml").write_text(rss, encoding="utf-8")
 
-    # --- Sitemap ---
-    urls = ["/", "/blog/", "/hakkimda/", "/projeler/"] + [p["url"] for p in posts]
+    # --- Sitemap (lastmod destekli) ---
+    latest = posts[0]["date_iso"] if posts else date.today().isoformat()
+    entries = [("/", latest), ("/blog/", latest), ("/hakkimda/", latest),
+               ("/projeler/", latest)] + [(p["url"], p["date_iso"]) for p in posts]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for u in urls:
-        sm.append(f"  <url><loc>{site['url']}{u}</loc></url>")
+    for u, lm in entries:
+        sm.append(f"  <url><loc>{site['url']}{u}</loc><lastmod>{lm}</lastmod></url>")
     sm.append("</urlset>")
     (DIST / "sitemap.xml").write_text("\n".join(sm), encoding="utf-8")
 
@@ -171,7 +173,7 @@ def main():
     (DIST / "robots.txt").write_text(
         f"User-agent: *\nAllow: /\n\nSitemap: {site['url']}/sitemap.xml\n", encoding="utf-8")
 
-    print(f"✓ {len(posts)} yazı, {len(urls)} sayfa -> dist/")
+    print(f"✓ {len(posts)} yazı, {len(entries)} sayfa -> dist/")
 
 
 if __name__ == "__main__":

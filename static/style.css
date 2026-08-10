@@ -194,12 +194,17 @@ html.dark #theme-toggle .moon { display: inline; }
 .highlight .o, .highlight .p { color: #B9B6C6; }
 
 /* ---------- hakkımda ---------- */
-.about-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start; padding-bottom: 56px; }
-.skills-card h3 { margin-top: 0; }
-.skills { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0; }
-.skills li { font-size: .95rem; padding: 11px 2px; border-bottom: 1px solid var(--line); }
-.skills li:last-child { border-bottom: none; }
-.skills li::before { content: "—"; color: var(--accent); margin-right: 10px; }
+.about-text { max-width: 720px; }
+.skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; padding-bottom: 24px; }
+.skill-group .overline { margin-bottom: 14px; }
+.skill-chips { display: flex; flex-wrap: wrap; gap: 9px; }
+.skill-chip {
+  font-size: .86rem; font-weight: 500; color: var(--ink);
+  border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--accent) 4%, var(--card));
+  padding: 6px 14px; border-radius: 999px;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.skill-group:hover .skill-chip { border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
 
 /* ---------- contact band ---------- */
 .contact-band {

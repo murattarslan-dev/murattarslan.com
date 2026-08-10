@@ -10,22 +10,88 @@ social:
   github: "https://github.com/murattarslan"
   linkedin: "https://www.linkedin.com/in/murattarslan"
 
-bio_short: "Yazılım geliştiriyorum; öğrendiklerimi ve deneyimlerimi burada yazıyorum."
+bio_short: "Android ve Flutter ile mobil uygulamalar geliştiriyorum; öğrendiklerimi ve deneyimlerimi burada yazıyorum."
 
 about: |
-  Merhaba! Ben **Murat**, yazılım geliştiricisiyim. Mobil uygulamalar başta olmak
-  üzere farklı alanlarda ürünler geliştiriyorum.
+  Ortaokul ve lise yıllarımdan beri teknolojiye hayranım. Elimdeki cihazların
+  sadece ne yaptığı değil, *nasıl* yaptığı da ilgimi çekerdi; o dünyayı
+  uzaktan izlemek yerine parçası olmak istedim. Bu istek beni **Konya Teknik
+  Üniversitesi Bilgisayar Mühendisliği**'ne, oradan da mobil geliştirmeye
+  taşıdı. Bugün hâlâ en büyük motivasyonum aynı: gelişen teknolojinin
+  izleyicisi değil, parçası olmak.
 
-  Bu blogda öğrendiklerimi, karşılaştığım problemleri ve çözümlerini,
-  denediğim teknolojileri yazıyorum. Amacım hem kendime bir not defteri
-  oluşturmak hem de aynı yoldan geçenlere faydalı olmak.
+  Beş yılı aşkın süredir mobil uygulama geliştiriyorum. Kariyerime **Arneca
+  Teknoloji**'de başladım ve halen orada devam ediyorum; kurumsal firmalara
+  yazılım çözümleri üretiyor, etkinlik organizasyonlarına yönelik ürünümüzü
+  geliştiriyoruz. Kurumsal dünyada çalışmanın bana öğrettiği en değerli şey
+  şu oldu: iyi yazılım, teknik hünerden önce doğru problemi anlamakla
+  başlıyor. Farklı sektörlerden gelen gerçek ihtiyaçlarla çalışmak, "çalışan
+  kod" ile "üretimde yıllarca ayakta kalan ürün" arasındaki farkı her gün
+  yeniden hatırlatıyor.
 
-skills:
-  - Flutter & Dart
-  - Kotlin & Android
-  - REST API & Backend
-  - Git & CI/CD
-  - Cloudflare Workers
+  Günlük işimin merkezinde **Android (Kotlin)** ve **Flutter** var; iki
+  dünyada da üretmeyi seviyorum. Native tarafın derinliği ile Flutter'ın
+  hızı birbirini tamamlıyor; hangi aracın nerede doğru seçim olduğuna karar
+  vermek de işin en keyifli kısımlarından. Bir uygulamanın kullanıcıya
+  görünmeyen tarafını, yani mimarisini, modülerliğini ve altı ay sonra da
+  rahat geliştirilebilir olmasını en az arayüzü kadar önemsiyorum. Temiz mimari
+  benim için bir tercihten çok alışkanlık.
+
+  Mobil ana odağım olsa da tek şeridim değil. **Spring Boot**, **Ktor** ve
+  **Go** ile backend servisleri geliştirdim; **Angular** ile web tarafında,
+  **Selenium** ve **Postman** ile test ve API dünyasında çalıştım. Bir
+  özelliğin mobil ekrandan veritabanına kadar bütün yolculuğunu görebilmek,
+  hem daha doğru teknik kararlar vermemi hem de backend ekipleriyle aynı
+  dili konuşmamı sağlıyor. Uçtan uca düşünebilen bir mobil geliştirici
+  olmak, bilinçli bir tercihim.
+
+  Önemsediğim bir diğer alan da **uygulama güvenliği**. Kurumsal projelerde
+  kullanıcı verisi taşıyan uygulamalar geliştirince güvenlik bir "ek özellik"
+  değil, işin temeli haline geliyor: **SSL pinning** ile araya girme (MITM)
+  saldırılarını engellemek, **kod karmaşıklaştırma** ile tersine mühendisliği
+  zorlaştırmak, sağlam **kimlik doğrulama** kurguları ve **veri şifreleme**
+  ile kullanıcıyı korumak, doğru kurgulanmış **loglama** ve **Crashlytics**
+  ile üretimde olup biteni görebilmek… Bunların hepsini sahada uyguladım; yayınladığım bir
+  uygulamanın sadece çalışmasını değil, kendini koruyabilmesini ve ne
+  yaptığını anlatabilmesini de isterim.
+
+  Son zamanlarda ise aklım LLM'lerde ve agent mimarilerinde. Herkes daha
+  büyük modellerin peşindeyken ben tersinden bakmayı deniyorum: hobi
+  projemde, tek bir konuda uzmanlaşmış, GPU gerektirmeden CPU üzerinde
+  milisaniyeler içinde yanıt verebilen bir **niyet tespiti ve parametre
+  doldurma modeli** geliştirmeye çalışıyorum. Hedefim bunu başarıp, fonksiyon
+  çağrılarıyla gerçek aksiyonlar alabilen kendi agent'ımı kurmak. Küçük,
+  odaklı ve hızlı modellerin pratikte büyük modellerden daha fazla iş
+  çözebileceğine inanıyorum; yanılıyorsam da bunu deneyerek öğrenmiş
+  olacağım.
+
+  Bu blog da tam olarak bunun için var. Bir konuyu gerçekten öğrenmenin en
+  iyi yolunun onu anlatmak olduğuna inanıyorum; burada yazdıklarım hem
+  kendime bıraktığım notlar hem de aynı problemlerle boğuşan birine denk
+  gelirse kazanılmış zamandır. Türkçe teknik kaynak hâlâ az; bir arama
+  sonucunda birinin karşısına çıkıp işini kolaylaştırmak, bu sitenin
+  varoluş amacına fazlasıyla yeter.
+
+  İş dışında hayatım çok kalabalık değil, bundan şikayetçi de değilim.
+  Doğada vakit geçirmeyi ve sinemayı severim; amatör olarak fotoğrafla
+  uğraşırım. Fotoğrafın kodla ortak bir yanı var: ikisi de neyi dahil
+  etmeyeceğine karar verme sanatı. Yazılım aynı zamanda hobim olduğu için
+  boş zamanımın bir kısmı da yine bu dünyada geçer. Ekran başında olmadığım
+  zamanlarda ise büyük ihtimalle ya bir patikada ya da bir film salonundayım.
+
+skill_groups:
+  - name: Mobil
+    items: [Kotlin, Android SDK & Jetpack, Flutter, Dart, Firebase]
+  - name: Uygulama Güvenliği
+    items: [SSL Pinning, Kod karmaşıklaştırma (ProGuard/R8), Kimlik doğrulama & yetkilendirme, Veri şifreleme, Güvenli API iletişimi]
+  - name: İzleme & Kalite
+    items: [Crashlytics, Loglama altyapıları, Selenium, Postman]
+  - name: Backend & Web
+    items: [Spring Boot, Ktor, Go, Angular, REST API]
+  - name: Araçlar & Süreç
+    items: [Git, CI/CD, Gradle, Mikroservis mimarisi, Temiz mimari & modüler tasarım]
+  - name: İlgi Alanları
+    items: [LLM & Agent mimarileri, On-device ML, Fotoğrafçılık]
 
 projects:
   - name: Hanio
@@ -36,7 +102,7 @@ projects:
     description: "Bu site. Markdown tabanlı, elle yazılmış bir statik site üreteci ile oluşturuluyor ve Cloudflare Workers üzerinde yayınlanıyor."
     link: "https://murattarslan.com"
     tags: [Python, Cloudflare]
-  - name: Yeni proje
-    description: "Yakında burada olacak."
+  - name: Niyet Tespit Modeli
+    description: "Tek bir alanda uzmanlaşmış, CPU üzerinde milisaniyeler içinde yanıt verebilen niyet tespiti ve parametre doldurma modeli. Hedef: fonksiyon çağrılarıyla aksiyon alabilen bir agent."
     link: ""
-    tags: [WIP]
+    tags: [LLM, NLP, WIP]
