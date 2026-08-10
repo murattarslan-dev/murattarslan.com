@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
   <title>Murat Arslan</title>
-  <link>https://murattarslan.com</link>
-  <atom:link href="https://murattarslan.com/rss.xml" rel="self" type="application/rss+xml"/>
+  <link>https://www.murattarslan.com</link>
+  <atom:link href="https://www.murattarslan.com/rss.xml" rel="self" type="application/rss+xml"/>
   <description>Murat Arslan — Software Developer. Yazılım, mobil geliştirme ve teknoloji üzerine blog.</description>
   <language>tr</language>
   <item>
     <title>Android&#x27;de SSL pinning: pratikte neye yarar, neyi kırar</title>
-    <link>https://murattarslan.com/blog/android-ssl-pinning-pratikte/</link>
-    <guid>https://murattarslan.com/blog/android-ssl-pinning-pratikte/</guid>
+    <link>https://www.murattarslan.com/blog/android-ssl-pinning-pratikte/</link>
+    <guid>https://www.murattarslan.com/blog/android-ssl-pinning-pratikte/</guid>
     <pubDate>Mon, 10 Aug 2026 09:00:00 +0300</pubDate>
     <description>Android&#x27;de SSL pinning kurmak kolay, yaşatmak zor: hangi yöntemi seçmeli, neyi pinlemeli ve sertifika yenilenirken uygulamayı nasıl kırmazsın?</description>
   </item>
   <item>
     <title>Yeni blog, yeni başlangıç</title>
-    <link>https://murattarslan.com/blog/yeni-blog-yeni-baslangic/</link>
-    <guid>https://murattarslan.com/blog/yeni-blog-yeni-baslangic/</guid>
+    <link>https://www.murattarslan.com/blog/yeni-blog-yeni-baslangic/</link>
+    <guid>https://www.murattarslan.com/blog/yeni-blog-yeni-baslangic/</guid>
     <pubDate>Sat, 08 Aug 2026 09:00:00 +0300</pubDate>
     <description>murattarslan.com&#x27;u sıfırdan yeniledim — markdown tabanlı statik bir site, Cloudflare Workers üzerinde. İşte nasıl ve neden.</description>
   </item>
