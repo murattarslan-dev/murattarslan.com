@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Android'de SSL pinning: pratikte neye yarar, neyi kırar · Murat Arslan</title>
+  <meta name="description" content="Android uygulamalarında SSL pinning'i sahada uygulamanın gerçek hikâyesi — hangi yöntem, hangi sertifikayı pinlemeli, sertifika yenilenirken uygulamayı nasıl kırmazsın ve pinning'in gerçekten ne kadar koruduğu.">
+  <meta name="author" content="Murat Arslan">
+  <link rel="canonical" href="https://murattarslan.com/blog/android-ssl-pinning-pratikte/">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="alternate" type="application/rss+xml" title="Murat Arslan" href="/rss.xml">
+
+  <meta property="og:site_name" content="Murat Arslan">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Android'de SSL pinning: pratikte neye yarar, neyi kırar">
+  <meta property="og:description" content="Android uygulamalarında SSL pinning'i sahada uygulamanın gerçek hikâyesi — hangi yöntem, hangi sertifikayı pinlemeli, sertifika yenilenirken uygulamayı nasıl kırmazsın ve pinning'in gerçekten ne kadar koruduğu.">
+  <meta property="og:url" content="https://murattarslan.com/blog/android-ssl-pinning-pratikte/">
+  <meta property="og:image" content="https://murattarslan.com/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Murat Arslan — Software Developer">
+  <meta property="og:locale" content="tr_TR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Android'de SSL pinning: pratikte neye yarar, neyi kırar">
+  <meta name="twitter:description" content="Android uygulamalarında SSL pinning'i sahada uygulamanın gerçek hikâyesi — hangi yöntem, hangi sertifikayı pinlemeli, sertifika yenilenirken uygulamayı nasıl kırmazsın ve pinning'in gerçekten ne kadar koruduğu.">
+  <meta name="twitter:image" content="https://murattarslan.com/assets/og.png">
+  
+  
+  <meta property="article:published_time" content="2026-08-10">
+  <meta property="article:author" content="Murat Arslan">
+  <meta property="article:tag" content="android">
+  <meta property="article:tag" content="kotlin">
+  <meta property="article:tag" content="güvenlik">
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Android'de SSL pinning: pratikte neye yarar, neyi kırar","datePublished":"2026-08-10","dateModified":"2026-08-10","inLanguage":"tr-TR","image":"https://murattarslan.com/assets/og.png","author":{"@type":"Person","name":"Murat Arslan","url":"https://murattarslan.com"},"publisher":{"@type":"Person","name":"Murat Arslan","url":"https://murattarslan.com"},"description":"Android uygulamalarında SSL pinning'i sahada uygulamanın gerçek hikâyesi — hangi yöntem, hangi sertifikayı pinlemeli, sertifika yenilenirken uygulamayı nasıl kırmazsın ve pinning'in gerçekten ne kadar koruduğu.","keywords":"android, kotlin, güvenlik","mainEntityOfPage":{"@type":"WebPage","@id":"https://murattarslan.com/blog/android-ssl-pinning-pratikte/"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Ana sayfa","item":"https://murattarslan.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://murattarslan.com/blog/"},{"@type":"ListItem","position":3,"name":"Android'de SSL pinning: pratikte neye yarar, neyi kırar","item":"https://murattarslan.com/blog/android-ssl-pinning-pratikte/"}]}
+  </script>
+  
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script>
+    (function(){
+      var t = null;
+      try { t = localStorage.getItem('theme'); } catch(e) {}
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header class="nav-wrap">
+    <nav class="nav container">
+      <a class="logo" href="/">MA<span class="logo-dot">.</span></a>
+      <div class="nav-links">
+        <a href="/blog/">Blog</a>
+        <a href="/projeler/">Projeler</a>
+        <a href="/hakkimda/">Hakkımda</a>
+        <button id="theme-toggle" aria-label="Tema değiştir" title="Tema değiştir">
+          <svg class="sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
+          <svg class="moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+  
+<article class="post">
+  <header class="post-head">
+    <div class="card-meta"><time datetime="2026-08-10">10 Ağustos 2026</time> · 5 dk okuma</div>
+    <h1>Android'de SSL pinning: pratikte neye yarar, neyi kırar</h1>
+    <div class="tags"><span class="tag">#android</span><span class="tag">#kotlin</span><span class="tag">#güvenlik</span></div>
+  </header>
+  <div class="prose">
+    <p>Kurumsal projelerde kullanıcı verisi taşıyan uygulamalar geliştirirken güvenlik bir &ldquo;ek özellik&rdquo; olmaktan çıkıyor. SSL pinning de bu listenin başında geliyor: fikir olarak beş dakikada anlatılır, ama üretimde yanlış kurarsan uygulamayı <strong>uzaktan kapatma düğmesine</strong> dönüşebilir. Bu yazıda hem nasıl kurulacağını hem de asıl önemlisi, nerede tökezlendiğini yazıyorum.</p>
+<h2 id="pinning-tam-olarak-neyi-cozuyor">Pinning tam olarak neyi çözüyor?</h2>
+<p>HTTPS zaten sunucunun sertifikasını doğruluyor. Ama neye göre? Cihazdaki <strong>güvenilen kök sertifika listesine</strong> göre. Yani o listedeki herhangi bir otorite senin alan adın için bir sertifika üretebilirse, uygulaman bunu sorunsuz kabul eder.</p>
+<p>Pinning bu güveni daraltıyor: &ldquo;bu alan adı için sadece <em>şu</em> açık anahtarı kabul ediyorum&rdquo; diyorsun. Kurumsal proxy&rsquo;ler, cihaza elle kurulmuş sertifikalar, Burp/mitmproxy gibi araçlar — hepsi bu noktada duvara çarpıyor.</p>
+<p>Ama bir nüansı baştan söylemek lazım: <strong>Android 7.0&rsquo;dan (API 24) itibaren</strong> uygulamalar kullanıcının elle kurduğu sertifika otoritelerine varsayılan olarak güvenmiyor. Yani &ldquo;telefona sertifika kurup trafiği dinlemek&rdquo; senaryosunun büyük kısmı, sen hiçbir şey yapmadan zaten kapalı. Pinning&rsquo;in sana kattığı şey daha çok şu: güvenilen otoritelerden birinin ele geçirilmesi ya da kötüye kullanılması durumunda da korunmak.</p>
+<h2 id="iki-yol-var">İki yol var</h2>
+<h3 id="1-network-security-config-platform-seviyesi">1. Network Security Config (platform seviyesi)</h3>
+<p><code>res/xml/network_security_config.xml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;network-security-config&gt;</span>
+<span class="w">    </span><span class="nt">&lt;domain-config&gt;</span>
+<span class="w">        </span><span class="nt">&lt;domain</span><span class="w"> </span><span class="na">includeSubdomains=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>api.example.com<span class="nt">&lt;/domain&gt;</span>
+<span class="w">        </span><span class="nt">&lt;pin-set</span><span class="w"> </span><span class="na">expiration=</span><span class="s">&quot;2027-01-01&quot;</span><span class="nt">&gt;</span>
+<span class="w">            </span><span class="nt">&lt;pin</span><span class="w"> </span><span class="na">digest=</span><span class="s">&quot;SHA-256&quot;</span><span class="nt">&gt;</span>k3XnEYQCK79AtL9GYnT/nyhsabas+HrbBg==<span class="nt">&lt;/pin&gt;</span>
+<span class="w">            </span><span class="nt">&lt;pin</span><span class="w"> </span><span class="na">digest=</span><span class="s">&quot;SHA-256&quot;</span><span class="nt">&gt;</span>YEDEK_ANAHTARIN_HASHI=<span class="nt">&lt;/pin&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/pin-set&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/domain-config&gt;</span>
+<span class="nt">&lt;/network-security-config&gt;</span>
+</code></pre></div>
+
+<p>Manifest&rsquo;te bağlıyorsun:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;application</span><span class="w"> </span><span class="na">android:networkSecurityConfig=</span><span class="s">&quot;@xml/network_security_config&quot;</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="nt">&gt;</span>
+</code></pre></div>
+
+<p>Avantajı: tek yerde tanımlıyorsun, sistem trust manager&rsquo;ını kullanan bütün istemcileri kapsıyor. Kod yazmıyorsun.</p>
+<p>Buradaki <code>expiration</code> alanı bence en değerli detay: o tarih geçtiğinde pinning <strong>kontrol edilmez hale geliyor</strong>. Kulağa güvenlik açığı gibi geliyor, ama aslında bilinçli bir tasarım — pinlerin eskidiği ve senin güncelleme çıkaramadığın bir durumda uygulamanın tamamen çalışmaz hale gelmesini engelliyor. Bunu bir kaza değil, <strong>sigorta</strong> olarak düşün.</p>
+<h3 id="2-okhttp-certificatepinner-kod-seviyesi">2. OkHttp CertificatePinner (kod seviyesi)</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">pinner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CertificatePinner</span><span class="p">.</span><span class="na">Builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&quot;api.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sha256/k3XnEYQCK79AtL9GYnT/nyhsabas+HrbBg==&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&quot;api.example.com&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sha256/YEDEK_ANAHTARIN_HASHI=&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">()</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OkHttpClient</span><span class="p">.</span><span class="na">Builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">certificatePinner</span><span class="p">(</span><span class="n">pinner</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Avantajı: API seviyesinden bağımsız çalışıyor, pinleri uzaktan yönetilebilir hale getirmek (remote config) mümkün, hata durumunu kodda yakalayıp raporlayabiliyorsun.</p>
+<p>Dezavantajı ve gözden kaçan kısım: bu pinning <strong>sadece o OkHttp istemcisinden geçen trafiği</strong> kapsıyor. Uygulamandaki WebView, üçüncü parti bir SDK&rsquo;nın kendi ağ katmanı ya da başka bir kütüphane bundan habersiz. Pinlediğini düşündüğün uygulamanın yarısı pinsiz olabilir — bunu ayrıca doğrulaman gerekiyor.</p>
+<p>Pratikte ikisini birlikte kullanmak makul: platform seviyesi geniş güvenlik ağı, OkHttp seviyesi ise kontrol ve gözlemlenebilirlik için.</p>
+<h2 id="pin-degerini-nasl-bulursun">Pin değerini nasıl bulursun?</h2>
+<p>Pinlediğin şey sertifikanın kendisi değil, <strong>açık anahtarın (SPKI) SHA-256 özeti</strong>. Bu ayrım önemli: sertifika yenilendiğinde anahtar aynı kalıyorsa pin&rsquo;in bozulmuyor.</p>
+<div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span>api.example.com:443<span class="w"> </span>-servername<span class="w"> </span>api.example.com<span class="w"> </span>&lt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="p">|</span><span class="w"> </span>openssl<span class="w"> </span>x509<span class="w"> </span>-pubkey<span class="w"> </span>-noout<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="p">|</span><span class="w"> </span>openssl<span class="w"> </span>pkey<span class="w"> </span>-pubin<span class="w"> </span>-outform<span class="w"> </span>der<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="p">|</span><span class="w"> </span>openssl<span class="w"> </span>dgst<span class="w"> </span>-sha256<span class="w"> </span>-binary<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="p">|</span><span class="w"> </span>openssl<span class="w"> </span>enc<span class="w"> </span>-base64
+</code></pre></div>
+
+<p>Kestirme bir yol da var: OkHttp&rsquo;ye kasten yanlış bir pin ver, isteği çalıştır. Fırlayan <code>SSLPeerUnverifiedException</code> sana zincirdeki sertifikaların beklenen pin değerlerini olduğu gibi yazıyor. Kopyala, yapıştır, geç.</p>
+<h2 id="hangi-sertifikay-pinlemeli">Hangi sertifikayı pinlemeli?</h2>
+<p>Burada gerçek bir denge var:</p>
+<table>
+<thead>
+<tr>
+<th>Ne pinlersin</th>
+<th>Ömür</th>
+<th>Güvenlik</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Yaprak (leaf) sertifika</td>
+<td>Kısa — 90 gün olabilir</td>
+<td>En sıkı</td>
+</tr>
+<tr>
+<td>Ara (intermediate) CA</td>
+<td>Yıllar</td>
+<td>Daha gevşek</td>
+</tr>
+</tbody>
+</table>
+<p>Yaprak sertifikayı pinlemek en güvenli olan, ama sertifika her yenilendiğinde yeni sürüm çıkarmak zorunda kalırsın. Ara CA&rsquo;yı pinlemek yıllarca dayanır, ancak o CA&rsquo;dan sertifika alabilen herkes pinini geçer.</p>
+<p>Benim tercihim ortada duruyor: <strong>anahtarı pinle, en az iki pin gönder.</strong> Biri aktif, biri henüz kullanılmayan yedek anahtar (offline saklanan). Sertifika yenilenirken yedeğe geçiyorsun, uygulama hiç kırılmıyor, sonraki sürümde yeni bir yedek ekliyorsun.</p>
+<h2 id="uygulamay-krmama-meselesi">Uygulamayı kırmama meselesi</h2>
+<p>Bu yazının asıl konusu burası. Web&rsquo;de yanlış pin bir <code>Ctrl+R</code> uzağında; mobilde değil. Store&rsquo;a yeni sürüm gönderirsin, kullanıcı güncellemeyi ne zaman alır bilmezsin — hiç almayabilir. Yanlış pin, o kullanıcı için uygulamanın <strong>tamamen çalışmaması</strong> demek.</p>
+<p>Sahada işe yarayan önlemler:</p>
+<ul>
+<li><strong>Her zaman en az iki pin</strong> — biri kullanımda olmayan yedek anahtar.</li>
+<li><strong><code>expiration</code> kullan</strong> — sigortayı devrede tut.</li>
+<li><strong>Kill switch</strong> — pinning&rsquo;i sunucudan kapatabileceğin bir uzaktan yapılandırma. Bu yapılandırmanın kendisinin pinli kanaldan gelmemesi gerekiyor, yoksa kilidi kilitli kapının arkasına koymuş olursun.</li>
+<li><strong>Ölç.</strong> Pinning hatasını sessizce yutma:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">client</span><span class="p">.</span><span class="na">newCall</span><span class="p">(</span><span class="n">request</span><span class="p">).</span><span class="na">execute</span><span class="p">()</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">e</span><span class="p">:</span><span class="w"> </span><span class="n">SSLPeerUnverifiedException</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Firebase</span><span class="p">.</span><span class="na">crashlytics</span><span class="p">.</span><span class="na">log</span><span class="p">(</span><span class="s">&quot;pin_failure host=</span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="na">url</span><span class="p">.</span><span class="na">host</span><span class="si">}</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Firebase</span><span class="p">.</span><span class="na">crashlytics</span><span class="p">.</span><span class="na">recordException</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">e</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Bu log olmadan, sertifika rotasyonunu yanlış yaptığını kullanıcı yorumlarından öğrenirsin. Bunu bir kez yaşamak, bu maddeyi kalıcı olarak hatırlamak için yeterli.</p>
+<ul>
+<li><strong>Sertifika rotasyonunu takvime yaz.</strong> Pinleri kim yeniliyor, hangi sürümde çıkıyor, backend ekibi sertifikayı değiştirmeden önce kimi haberdar ediyor? Bu teknik değil, süreç problemi — ve pinning&rsquo;in en sık kırıldığı yer tam olarak burası.</li>
+</ul>
+<h2 id="peki-gercekten-aslamaz-m">Peki gerçekten aşılamaz mı?</h2>
+<p>Hayır. Root&rsquo;lu bir cihazda Frida ile <code>CertificatePinner</code>&lsquo;ı ya da trust manager&rsquo;ı çalışma zamanında değiştirmek bilinen bir iş. Pinning, kararlı bir tersine mühendisin karşısında bir duvar değil, bir <strong>maliyet artırıcı</strong>.</p>
+<p>Bu yüzden zihinsel modeli doğru kurmak gerekiyor: pinning, <strong>kullanıcını ağ üzerindeki saldırgana karşı</strong> korur. API&rsquo;ni, uygulamanı parçalamaya çalışan birine karşı korumaz. &ldquo;Trafik pinli, o yüzden bu endpoint güvende&rdquo; cümlesi kurulduğu anda bir yerde hata var — yetkilendirme, oran sınırlama ve sunucu tarafı doğrulama pinning&rsquo;e devredilebilecek şeyler değil.</p>
+<h2 id="flutter-tarafnda-ksa-not">Flutter tarafında kısa not</h2>
+<p><code>dio</code> ya da <code>http</code> kullanıyorsan pinning&rsquo;i <code>HttpClient</code> üzerinden, sertifikanın özetini karşılaştırarak kurabiliyorsun. Ama Android tarafında zaten Network Security Config varsa, platform seviyesindeki tanımın Dart katmanındaki <code>HttpClient</code> için de geçerli olduğunu unutma — iki katmanda çelişen pin tanımı yapıp neden bağlanamadığını aramak keyifli bir akşam değil. Buna ayrı bir yazı borçluyum.</p>
+<hr>
+<p>Özetle: pinning kurmak kolay, <strong>yaşatmak</strong> zor. Kurarken kendine tek bir soru sor — &ldquo;sertifika beklenmedik şekilde değişirse ne olacak?&rdquo; Bu sorunun cevabı &ldquo;kullanıcının uygulaması açılmaz&rdquo; ise, kurulumun daha bitmemiş demektir.</p>
+  </div>
+  <footer class="post-footer">
+    <a class="btn btn-ghost" href="/blog/">← Tüm yazılar</a>
+    <p class="post-cta">Sorusu ya da yorumu olan: <a href="mailto:murattarslan.dev@gmail.com">murattarslan.dev@gmail.com</a> 📮</p>
+  </footer>
+</article>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© 2026 Murat Arslan · <a href="/rss.xml">RSS</a></p>
+      <div class="footer-social">
+        <a href="https://github.com/murattarslan-dev" rel="me noopener" target="_blank" aria-label="GitHub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11.1 11.1 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/murattarslan" rel="me noopener" target="_blank" aria-label="LinkedIn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        </a>
+        <a href="mailto:murattarslan.dev@gmail.com" aria-label="E-posta">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('theme-toggle').addEventListener('click', function(){
+      var dark = document.documentElement.classList.toggle('dark');
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch(e) {}
+    });
+  </script>
+</body>
+</html>

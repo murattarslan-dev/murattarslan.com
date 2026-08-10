@@ -7,18 +7,18 @@
   <description>Murat Arslan — Software Developer. Yazılım, mobil geliştirme ve teknoloji üzerine blog.</description>
   <language>tr</language>
   <item>
+    <title>Android&#x27;de SSL pinning: pratikte neye yarar, neyi kırar</title>
+    <link>https://murattarslan.com/blog/android-ssl-pinning-pratikte/</link>
+    <guid>https://murattarslan.com/blog/android-ssl-pinning-pratikte/</guid>
+    <pubDate>Mon, 10 Aug 2026 09:00:00 +0300</pubDate>
+    <description>Android uygulamalarında SSL pinning&#x27;i sahada uygulamanın gerçek hikâyesi — hangi yöntem, hangi sertifikayı pinlemeli, sertifika yenilenirken uygulamayı nasıl kırmazsın ve pinning&#x27;in gerçekten ne kadar koruduğu.</description>
+  </item>
+  <item>
     <title>Yeni blog, yeni başlangıç</title>
     <link>https://murattarslan.com/blog/yeni-blog-yeni-baslangic/</link>
     <guid>https://murattarslan.com/blog/yeni-blog-yeni-baslangic/</guid>
     <pubDate>Sat, 08 Aug 2026 09:00:00 +0300</pubDate>
     <description>murattarslan.com&#x27;u sıfırdan yeniledim — markdown tabanlı statik bir site, Cloudflare Workers üzerinde. İşte nasıl ve neden.</description>
-  </item>
-  <item>
-    <title>Örnek yazı taslağı (bunu düzenle ya da sil)</title>
-    <link>https://murattarslan.com/blog/ornek-yazi-taslagi/</link>
-    <guid>https://murattarslan.com/blog/ornek-yazi-taslagi/</guid>
-    <pubDate>Sat, 01 Aug 2026 09:00:00 +0300</pubDate>
-    <description>Bu bir örnek taslak — markdown formatının nasıl kullanılacağını gösteriyor. Kendi yazınla değiştirebilirsin.</description>
   </item>
 </channel>
 </rss>
