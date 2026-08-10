@@ -75,7 +75,7 @@
   
 <article class="post">
   <header class="post-head">
-    <div class="card-meta"><time datetime="2026-08-10">10 Ağustos 2026</time> · 5 dk okuma</div>
+    <div class="card-meta"><time datetime="2026-08-10">10 Ağustos 2026</time> · 6 dk okuma</div>
     <h1>Android'de SSL pinning: pratikte neye yarar, neyi kırar</h1>
     <div class="tags"><span class="tag">#android</span><span class="tag">#kotlin</span><span class="tag">#güvenlik</span></div>
   </header>
@@ -85,7 +85,7 @@
 <p>HTTPS zaten sunucunun sertifikasını doğruluyor. Ama neye göre? Cihazdaki <strong>güvenilen kök sertifika listesine</strong> göre. Yani o listedeki herhangi bir otorite senin alan adın için bir sertifika üretebilirse, uygulaman bunu sorunsuz kabul eder.</p>
 <p>Pinning bu güveni daraltıyor: &ldquo;bu alan adı için sadece <em>şu</em> açık anahtarı kabul ediyorum&rdquo; diyorsun. Kurumsal proxy&rsquo;ler, cihaza elle kurulmuş sertifikalar, Burp/mitmproxy gibi araçlar — hepsi bu noktada duvara çarpıyor.</p>
 <p>Ama bir nüansı baştan söylemek lazım: <strong>Android 7.0&rsquo;dan (API 24) itibaren</strong> uygulamalar kullanıcının elle kurduğu sertifika otoritelerine varsayılan olarak güvenmiyor. Yani &ldquo;telefona sertifika kurup trafiği dinlemek&rdquo; senaryosunun büyük kısmı, sen hiçbir şey yapmadan zaten kapalı. Pinning&rsquo;in sana kattığı şey daha çok şu: güvenilen otoritelerden birinin ele geçirilmesi ya da kötüye kullanılması durumunda da korunmak.</p>
-<h2 id="iki-yol-var">İki yol var</h2>
+<h2 id="nasl-kurulur-uc-yaklasm">Nasıl kurulur: üç yaklaşım</h2>
 <h3 id="1-network-security-config-platform-seviyesi">1. Network Security Config (platform seviyesi)</h3>
 <p><code>res/xml/network_security_config.xml</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
@@ -119,7 +119,79 @@
 
 <p>Avantajı: API seviyesinden bağımsız çalışıyor, pinleri uzaktan yönetilebilir hale getirmek (remote config) mümkün, hata durumunu kodda yakalayıp raporlayabiliyorsun.</p>
 <p>Dezavantajı ve gözden kaçan kısım: bu pinning <strong>sadece o OkHttp istemcisinden geçen trafiği</strong> kapsıyor. Uygulamandaki WebView, üçüncü parti bir SDK&rsquo;nın kendi ağ katmanı ya da başka bir kütüphane bundan habersiz. Pinlediğini düşündüğün uygulamanın yarısı pinsiz olabilir — bunu ayrıca doğrulaman gerekiyor.</p>
-<p>Pratikte ikisini birlikte kullanmak makul: platform seviyesi geniş güvenlik ağı, OkHttp seviyesi ise kontrol ve gözlemlenebilirlik için.</p>
+<h3 id="3-sertifikann-kendisini-gommek-resraw">3. Sertifikanın kendisini gömmek (<code>res/raw</code>)</h3>
+<p>Yukarıdaki iki yol sertifikanın <strong>özetini</strong> gömüyor. Bir üçüncü yol daha var: sertifikanın <strong>kendisini</strong> uygulamaya koyup güven zincirini doğrudan oradan kurmak. Kurumsal projelerde sık karşılaşılan bir durumda — API&rsquo;yi kendi iç CA&rsquo;nızla imzalıyorsanız — pratikte tek makul yol bu, çünkü cihazdaki kök sertifika listesinde sizin CA&rsquo;nız zaten yok.</p>
+<p>Sertifikayı <code>res/raw/api_ca.crt</code> olarak koyuyorsun (PEM ya da DER olabilir), sonra Network Security Config&rsquo;te güven çıpası olarak gösteriyorsun:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;domain-config&gt;</span>
+<span class="w">    </span><span class="nt">&lt;domain</span><span class="w"> </span><span class="na">includeSubdomains=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>api.example.com<span class="nt">&lt;/domain&gt;</span>
+<span class="w">    </span><span class="nt">&lt;trust-anchors&gt;</span>
+<span class="w">        </span><span class="nt">&lt;certificates</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;@raw/api_ca&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/trust-anchors&gt;</span>
+<span class="nt">&lt;/domain-config&gt;</span>
+</code></pre></div>
+
+<p>Bu tanım o alan adı için cihazdaki bütün kök sertifika listesini devre dışı bırakıp yerine tek bir otorite koyuyor. Platform CA&rsquo;larını da korumak istiyorsan ikisini birlikte yazabiliyorsun:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;trust-anchors&gt;</span>
+<span class="w">    </span><span class="nt">&lt;certificates</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;@raw/api_ca&quot;</span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;certificates</span><span class="w"> </span><span class="na">src=</span><span class="s">&quot;system&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/trust-anchors&gt;</span>
+</code></pre></div>
+
+<p>Aynı şeyi kod tarafında kurmak istersen (<code>com.squareup.okhttp3:okhttp-tls</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">ca</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">context</span><span class="p">.</span><span class="na">resources</span><span class="p">.</span><span class="na">openRawResource</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="na">raw</span><span class="p">.</span><span class="na">api_ca</span><span class="p">).</span><span class="na">use</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">    </span><span class="n">CertificateFactory</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;X.509&quot;</span><span class="p">).</span><span class="na">generateCertificate</span><span class="p">(</span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">X509Certificate</span>
+<span class="p">}</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">certs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HandshakeCertificates</span><span class="p">.</span><span class="na">Builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">addTrustedCertificate</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">// .addPlatformTrustedCertificates()  // genel CA&#39;lar da gerekiyorsa</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">()</span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OkHttpClient</span><span class="p">.</span><span class="na">Builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">sslSocketFactory</span><span class="p">(</span><span class="n">certs</span><span class="p">.</span><span class="na">sslSocketFactory</span><span class="p">(),</span><span class="w"> </span><span class="n">certs</span><span class="p">.</span><span class="na">trustManager</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">()</span>
+</code></pre></div>
+
+<p>Buradaki tuzağı özellikle işaretlemek istiyorum: <code>addTrustedCertificate</code> tek başına kullanıldığında <strong>platform CA&rsquo;ları devrede olmuyor</strong>. Aynı istemciden analitik, harita, görsel CDN&rsquo;i gibi başka istekler de geçiyorsa hepsi bir anda bağlanamaz hale gelir. Ya <code>addPlatformTrustedCertificates()</code> ekleyeceksin ya da bu istemciyi sadece kendi API&rsquo;n için ayıracaksın — ikincisi daha temiz bir kurgu.</p>
+<h3 id="pin-mi-sertifika-dosyas-m">Pin mi, sertifika dosyası mı?</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>SPKI pin</th>
+<th>Gömülü sertifika (<code>res/raw</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gömülen şey</td>
+<td>Açık anahtarın SHA-256 özeti</td>
+<td>Sertifikanın kendisi</td>
+</tr>
+<tr>
+<td>Sertifika yenilendiğinde</td>
+<td>Anahtar aynıysa etkilenmez</td>
+<td>Gömülü CA&rsquo;nın süresi bitene kadar sorun yok</td>
+</tr>
+<tr>
+<td>Kendi iç CA&rsquo;n varsa</td>
+<td>Tek başına yetmez</td>
+<td>Doğru araç</td>
+</tr>
+<tr>
+<td>Genel CA listesi</td>
+<td>Daraltır</td>
+<td>Tamamen değiştirebilir</td>
+</tr>
+<tr>
+<td>En büyük riski</td>
+<td>Yanlış/eksik pin</td>
+<td>Gömülü sertifikanın süresinin dolması</td>
+</tr>
+</tbody>
+</table>
+<p>Kaba bir kural: <strong>halka açık bir CA&rsquo;dan sertifika alıyorsan pin</strong>, <strong>kendi PKI&rsquo;ını işletiyorsan gömülü sertifika</strong>. Bunlar birbirinin alternatifi değil, farklı problemleri çözüyorlar — ve gerektiğinde birlikte de kullanılabilirler.</p>
+<p>Katmanları birleştirmek de makul: platform seviyesi geniş güvenlik ağı, OkHttp seviyesi ise kontrol ve gözlemlenebilirlik için.</p>
 <h2 id="pin-degerini-nasl-bulursun">Pin değerini nasıl bulursun?</h2>
 <p>Pinlediğin şey sertifikanın kendisi değil, <strong>açık anahtarın (SPKI) SHA-256 özeti</strong>. Bu ayrım önemli: sertifika yenilendiğinde anahtar aynı kalıyorsa pin&rsquo;in bozulmuyor.</p>
 <div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span>api.example.com:443<span class="w"> </span>-servername<span class="w"> </span>api.example.com<span class="w"> </span>&lt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="se">\</span>
@@ -175,13 +247,13 @@
 
 <p>Bu log olmadan, sertifika rotasyonunu yanlış yaptığını kullanıcı yorumlarından öğrenirsin. Bunu bir kez yaşamak, bu maddeyi kalıcı olarak hatırlamak için yeterli.</p>
 <ul>
-<li><strong>Sertifika rotasyonunu takvime yaz.</strong> Pinleri kim yeniliyor, hangi sürümde çıkıyor, backend ekibi sertifikayı değiştirmeden önce kimi haberdar ediyor? Bu teknik değil, süreç problemi — ve pinning&rsquo;in en sık kırıldığı yer tam olarak burası.</li>
+<li><strong>Sertifika rotasyonunu takvime yaz.</strong> Pinleri kim yeniliyor, hangi sürümde çıkıyor, backend ekibi sertifikayı değiştirmeden önce kimi haberdar ediyor? Gömülü sertifika kullanıyorsan aynı takvimde onun son kullanma tarihi de olmalı — o gün geldiğinde güncellenmemiş her kurulum kırılıyor. Bu teknik değil, süreç problemi — ve pinning&rsquo;in en sık kırıldığı yer tam olarak burası.</li>
 </ul>
 <h2 id="peki-gercekten-aslamaz-m">Peki gerçekten aşılamaz mı?</h2>
 <p>Hayır. Root&rsquo;lu bir cihazda Frida ile <code>CertificatePinner</code>&lsquo;ı ya da trust manager&rsquo;ı çalışma zamanında değiştirmek bilinen bir iş. Pinning, kararlı bir tersine mühendisin karşısında bir duvar değil, bir <strong>maliyet artırıcı</strong>.</p>
 <p>Bu yüzden zihinsel modeli doğru kurmak gerekiyor: pinning, <strong>kullanıcını ağ üzerindeki saldırgana karşı</strong> korur. API&rsquo;ni, uygulamanı parçalamaya çalışan birine karşı korumaz. &ldquo;Trafik pinli, o yüzden bu endpoint güvende&rdquo; cümlesi kurulduğu anda bir yerde hata var — yetkilendirme, oran sınırlama ve sunucu tarafı doğrulama pinning&rsquo;e devredilebilecek şeyler değil.</p>
 <h2 id="flutter-tarafnda-ksa-not">Flutter tarafında kısa not</h2>
-<p><code>dio</code> ya da <code>http</code> kullanıyorsan pinning&rsquo;i <code>HttpClient</code> üzerinden, sertifikanın özetini karşılaştırarak kurabiliyorsun. Ama Android tarafında zaten Network Security Config varsa, platform seviyesindeki tanımın Dart katmanındaki <code>HttpClient</code> için de geçerli olduğunu unutma — iki katmanda çelişen pin tanımı yapıp neden bağlanamadığını aramak keyifli bir akşam değil. Buna ayrı bir yazı borçluyum.</p>
+<p><code>dio</code> ya da <code>http</code> kullanıyorsan pinning&rsquo;i <code>HttpClient</code> üzerinden, sertifikanın özetini karşılaştırarak kurabiliyorsun. Ama Android tarafında zaten Network Security Config varsa, platform seviyesindeki tanımın Dart katmanındaki <code>HttpClient</code> için de geçerli olduğunu unutma.</p>
 <hr>
 <p>Özetle: pinning kurmak kolay, <strong>yaşatmak</strong> zor. Kurarken kendine tek bir soru sor — &ldquo;sertifika beklenmedik şekilde değişirse ne olacak?&rdquo; Bu sorunun cevabı &ldquo;kullanıcının uygulaması açılmaz&rdquo; ise, kurulumun daha bitmemiş demektir.</p>
   </div>

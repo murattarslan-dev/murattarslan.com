@@ -16,7 +16,7 @@ Pinning bu güveni daraltıyor: "bu alan adı için sadece *şu* açık anahtar�
 
 Ama bir nüansı baştan söylemek lazım: **Android 7.0'dan (API 24) itibaren** uygulamalar kullanıcının elle kurduğu sertifika otoritelerine varsayılan olarak güvenmiyor. Yani "telefona sertifika kurup trafiği dinlemek" senaryosunun büyük kısmı, sen hiçbir şey yapmadan zaten kapalı. Pinning'in sana kattığı şey daha çok şu: güvenilen otoritelerden birinin ele geçirilmesi ya da kötüye kullanılması durumunda da korunmak.
 
-## İki yol var
+## Nasıl kurulur: üç yaklaşım
 
 ### 1. Network Security Config (platform seviyesi)
 
@@ -62,7 +62,62 @@ Avantajı: API seviyesinden bağımsız çalışıyor, pinleri uzaktan yönetile
 
 Dezavantajı ve gözden kaçan kısım: bu pinning **sadece o OkHttp istemcisinden geçen trafiği** kapsıyor. Uygulamandaki WebView, üçüncü parti bir SDK'nın kendi ağ katmanı ya da başka bir kütüphane bundan habersiz. Pinlediğini düşündüğün uygulamanın yarısı pinsiz olabilir — bunu ayrıca doğrulaman gerekiyor.
 
-Pratikte ikisini birlikte kullanmak makul: platform seviyesi geniş güvenlik ağı, OkHttp seviyesi ise kontrol ve gözlemlenebilirlik için.
+### 3. Sertifikanın kendisini gömmek (`res/raw`)
+
+Yukarıdaki iki yol sertifikanın **özetini** gömüyor. Bir üçüncü yol daha var: sertifikanın **kendisini** uygulamaya koyup güven zincirini doğrudan oradan kurmak. Kurumsal projelerde sık karşılaşılan bir durumda — API'yi kendi iç CA'nızla imzalıyorsanız — pratikte tek makul yol bu, çünkü cihazdaki kök sertifika listesinde sizin CA'nız zaten yok.
+
+Sertifikayı `res/raw/api_ca.crt` olarak koyuyorsun (PEM ya da DER olabilir), sonra Network Security Config'te güven çıpası olarak gösteriyorsun:
+
+```xml
+<domain-config>
+    <domain includeSubdomains="true">api.example.com</domain>
+    <trust-anchors>
+        <certificates src="@raw/api_ca"/>
+    </trust-anchors>
+</domain-config>
+```
+
+Bu tanım o alan adı için cihazdaki bütün kök sertifika listesini devre dışı bırakıp yerine tek bir otorite koyuyor. Platform CA'larını da korumak istiyorsan ikisini birlikte yazabiliyorsun:
+
+```xml
+<trust-anchors>
+    <certificates src="@raw/api_ca"/>
+    <certificates src="system"/>
+</trust-anchors>
+```
+
+Aynı şeyi kod tarafında kurmak istersen (`com.squareup.okhttp3:okhttp-tls`):
+
+```kotlin
+val ca = context.resources.openRawResource(R.raw.api_ca).use { input ->
+    CertificateFactory.getInstance("X.509").generateCertificate(input) as X509Certificate
+}
+
+val certs = HandshakeCertificates.Builder()
+    .addTrustedCertificate(ca)
+    // .addPlatformTrustedCertificates()  // genel CA'lar da gerekiyorsa
+    .build()
+
+val client = OkHttpClient.Builder()
+    .sslSocketFactory(certs.sslSocketFactory(), certs.trustManager)
+    .build()
+```
+
+Buradaki tuzağı özellikle işaretlemek istiyorum: `addTrustedCertificate` tek başına kullanıldığında **platform CA'ları devrede olmuyor**. Aynı istemciden analitik, harita, görsel CDN'i gibi başka istekler de geçiyorsa hepsi bir anda bağlanamaz hale gelir. Ya `addPlatformTrustedCertificates()` ekleyeceksin ya da bu istemciyi sadece kendi API'n için ayıracaksın — ikincisi daha temiz bir kurgu.
+
+### Pin mi, sertifika dosyası mı?
+
+| | SPKI pin | Gömülü sertifika (`res/raw`) |
+|---|---|---|
+| Gömülen şey | Açık anahtarın SHA-256 özeti | Sertifikanın kendisi |
+| Sertifika yenilendiğinde | Anahtar aynıysa etkilenmez | Gömülü CA'nın süresi bitene kadar sorun yok |
+| Kendi iç CA'n varsa | Tek başına yetmez | Doğru araç |
+| Genel CA listesi | Daraltır | Tamamen değiştirebilir |
+| En büyük riski | Yanlış/eksik pin | Gömülü sertifikanın süresinin dolması |
+
+Kaba bir kural: **halka açık bir CA'dan sertifika alıyorsan pin**, **kendi PKI'ını işletiyorsan gömülü sertifika**. Bunlar birbirinin alternatifi değil, farklı problemleri çözüyorlar — ve gerektiğinde birlikte de kullanılabilirler.
+
+Katmanları birleştirmek de makul: platform seviyesi geniş güvenlik ağı, OkHttp seviyesi ise kontrol ve gözlemlenebilirlik için.
 
 ## Pin değerini nasıl bulursun?
 
@@ -114,7 +169,7 @@ try {
 
 Bu log olmadan, sertifika rotasyonunu yanlış yaptığını kullanıcı yorumlarından öğrenirsin. Bunu bir kez yaşamak, bu maddeyi kalıcı olarak hatırlamak için yeterli.
 
-- **Sertifika rotasyonunu takvime yaz.** Pinleri kim yeniliyor, hangi sürümde çıkıyor, backend ekibi sertifikayı değiştirmeden önce kimi haberdar ediyor? Bu teknik değil, süreç problemi — ve pinning'in en sık kırıldığı yer tam olarak burası.
+- **Sertifika rotasyonunu takvime yaz.** Pinleri kim yeniliyor, hangi sürümde çıkıyor, backend ekibi sertifikayı değiştirmeden önce kimi haberdar ediyor? Gömülü sertifika kullanıyorsan aynı takvimde onun son kullanma tarihi de olmalı — o gün geldiğinde güncellenmemiş her kurulum kırılıyor. Bu teknik değil, süreç problemi — ve pinning'in en sık kırıldığı yer tam olarak burası.
 
 ## Peki gerçekten aşılamaz mı?
 
@@ -124,7 +179,7 @@ Bu yüzden zihinsel modeli doğru kurmak gerekiyor: pinning, **kullanıcını a�
 
 ## Flutter tarafında kısa not
 
-`dio` ya da `http` kullanıyorsan pinning'i `HttpClient` üzerinden, sertifikanın özetini karşılaştırarak kurabiliyorsun. Ama Android tarafında zaten Network Security Config varsa, platform seviyesindeki tanımın Dart katmanındaki `HttpClient` için de geçerli olduğunu unutma — iki katmanda çelişen pin tanımı yapıp neden bağlanamadığını aramak keyifli bir akşam değil. Buna ayrı bir yazı borçluyum.
+`dio` ya da `http` kullanıyorsan pinning'i `HttpClient` üzerinden, sertifikanın özetini karşılaştırarak kurabiliyorsun. Ama Android tarafında zaten Network Security Config varsa, platform seviyesindeki tanımın Dart katmanındaki `HttpClient` için de geçerli olduğunu unutma.
 
 ---
 
