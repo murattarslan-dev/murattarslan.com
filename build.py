@@ -88,6 +88,8 @@ def load_posts():
             "date_h": fmt_date(d),
             "date_iso": d.isoformat(),
             "description": meta.get("description", ""),
+            "cover": meta.get("cover", ""),
+            "cover_alt": meta.get("cover_alt", meta.get("title", "")),
             "tags": meta.get("tags", []),
             "slug": slug,
             "url": f"/blog/{slug}/",
@@ -126,7 +128,8 @@ def main():
     for p in posts:
         render("post.html", f"blog/{p['slug']}/index.html", post=p,
                page={"url": p["url"], "title": p["title"], "description": p["description"],
-                     "type": "article", "date_iso": p["date_iso"], "tags": p["tags"]})
+                     "type": "article", "date_iso": p["date_iso"], "tags": p["tags"],
+                     "image": p["cover"], "image_alt": p["cover_alt"]})
     render("hakkimda.html", "hakkimda/index.html",
            page={"url": "/hakkimda/", "title": "Hakkımda", "description": "Murat Arslan kimdir?"})
     render("projeler.html", "projeler/index.html",

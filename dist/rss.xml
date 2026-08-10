@@ -11,7 +11,7 @@
     <link>https://murattarslan.com/blog/android-ssl-pinning-pratikte/</link>
     <guid>https://murattarslan.com/blog/android-ssl-pinning-pratikte/</guid>
     <pubDate>Mon, 10 Aug 2026 09:00:00 +0300</pubDate>
-    <description>Android uygulamalarında SSL pinning&#x27;i sahada uygulamanın gerçek hikâyesi — hangi yöntem, hangi sertifikayı pinlemeli, sertifika yenilenirken uygulamayı nasıl kırmazsın ve pinning&#x27;in gerçekten ne kadar koruduğu.</description>
+    <description>Android&#x27;de SSL pinning kurmak kolay, yaşatmak zor: hangi yöntemi seçmeli, neyi pinlemeli ve sertifika yenilenirken uygulamayı nasıl kırmazsın?</description>
   </item>
   <item>
     <title>Yeni blog, yeni başlangıç</title>

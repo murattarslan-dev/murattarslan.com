@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <article class="post">
-  <header class="post-head">
+  {% if post.cover %}
+  <figure class="post-cover">
+    <img src="{{ post.cover }}" alt="{{ post.cover_alt }}" width="1200" height="630" fetchpriority="high" decoding="async">
+  </figure>
+  {% endif %}
+  <header class="post-head{% if post.cover %} has-cover{% endif %}">
     <div class="card-meta"><time datetime="{{ post.date_iso }}">{{ post.date_h }}</time> · {{ post.reading }} dk okuma</div>
     <h1>{{ post.title }}</h1>
     <div class="tags">{% for t in post.tags %}<span class="tag">#{{ t }}</span>{% endfor %}</div>

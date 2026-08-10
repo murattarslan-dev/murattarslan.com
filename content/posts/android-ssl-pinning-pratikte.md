@@ -2,7 +2,9 @@
 title: "Android'de SSL pinning: pratikte neye yarar, neyi kırar"
 slug: android-ssl-pinning-pratikte
 date: 2026-08-10
-description: Android uygulamalarında SSL pinning'i sahada uygulamanın gerçek hikâyesi — hangi yöntem, hangi sertifikayı pinlemeli, sertifika yenilenirken uygulamayı nasıl kırmazsın ve pinning'in gerçekten ne kadar koruduğu.
+description: "Android'de SSL pinning kurmak kolay, yaşatmak zor: hangi yöntemi seçmeli, neyi pinlemeli ve sertifika yenilenirken uygulamayı nasıl kırmazsın?"
+cover: /assets/covers/android-ssl-pinning-pratikte.jpg
+cover_alt: "Android'de SSL pinning: MITM saldırısının engellenmesi, Burp/Charles gibi araçların devre dışı kalması ve root'lu cihazda Frida/Xposed ile pinning'in aşılması"
 tags: [android, kotlin, güvenlik]
 ---
 
