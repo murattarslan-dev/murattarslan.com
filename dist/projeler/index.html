@@ -128,6 +128,30 @@
       var dark = document.documentElement.classList.toggle('dark');
       try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch(e) {}
     });
+
+    var copyBtn = document.getElementById('copy-link');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function(){
+        var url = copyBtn.getAttribute('data-url') || location.href;
+        var done = function(){
+          copyBtn.classList.add('copied');
+          setTimeout(function(){ copyBtn.classList.remove('copied'); }, 1800);
+        };
+        var fallback = function(){
+          var ta = document.createElement('textarea');
+          ta.value = url; ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); done(); } catch(e) {}
+          document.body.removeChild(ta);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(done, fallback);
+        } else {
+          fallback();
+        }
+      });
+    }
   </script>
 </body>
 </html>

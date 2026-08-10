@@ -181,8 +181,32 @@ html.dark #theme-toggle .moon { display: inline; }
 .prose th, .prose td { border: 1px solid var(--line-strong); padding: 9px 14px; text-align: left; }
 .prose th { font-family: var(--font-display); font-weight: 600; background: color-mix(in srgb, var(--accent) 7%, var(--card)); }
 .prose a { text-decoration: underline; text-underline-offset: 3px; }
-.post-footer { margin-top: 52px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.post-footer { margin-top: 26px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .post-cta { color: var(--muted); font-size: .93rem; }
+
+/* paylaş */
+.post-share {
+  margin-top: 52px; padding-top: 22px; border-top: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+}
+.post-share-label { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.share-actions { display: flex; align-items: center; gap: 9px; }
+.share-btn {
+  width: 38px; height: 38px; display: inline-grid; place-items: center; position: relative;
+  background: transparent; border: 1px solid var(--line-strong); border-radius: 50%;
+  color: var(--muted); cursor: pointer; padding: 0;
+  transition: color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.share-btn:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; transform: translateY(-1px); }
+.share-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.share-btn.copied { color: var(--accent); border-color: var(--accent); }
+.copied-tip {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(3px);
+  font-family: var(--font-mono); font-size: .7rem; letter-spacing: .02em; white-space: nowrap;
+  padding: 4px 8px; border-radius: 6px; background: var(--ink); color: var(--bg);
+  opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease;
+}
+.share-btn.copied .copied-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* syntax highlight */
 .highlight .k, .highlight .kd, .highlight .kn { color: #D7B47E; }
@@ -231,4 +255,5 @@ html.dark #theme-toggle .moon { display: inline; }
   .post-row { grid-template-columns: 1fr; gap: 4px; }
   .about-grid { grid-template-columns: 1fr; }
   .nav-links { gap: 16px; font-size: .92rem; }
+  .post-share { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
