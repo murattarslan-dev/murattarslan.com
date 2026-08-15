@@ -4,7 +4,7 @@
   <title>Murat Arslan</title>
   <link>https://www.murattarslan.com</link>
   <atom:link href="https://www.murattarslan.com/rss.xml" rel="self" type="application/rss+xml"/>
-  <description>Murat Arslan — Software Developer. Yazılım, mobil geliştirme ve teknoloji üzerine blog.</description>
+  <description>Murat Arslan — Software Developer. Android, Kotlin ve Flutter ile mobil geliştirme; uygulama güvenliği, CI/CD ve öğrendiklerim üzerine notlar.</description>
   <language>tr</language>
   <item>
     <title>Mobil CI/CD: kurduğum mimari ve verdiğim kararlar</title>

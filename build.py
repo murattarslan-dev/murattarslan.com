@@ -119,11 +119,15 @@ def load_posts():
         if isinstance(d, str):
             d = datetime.strptime(d, "%Y-%m-%d").date()
         slug = meta.get("slug") or slugify(meta.get("title", f.stem))
+        upd = meta.get("updated")
+        if isinstance(upd, str):
+            upd = datetime.strptime(upd, "%Y-%m-%d").date()
         posts.append({
             "title": meta.get("title", f.stem),
             "date": d,
             "date_h": fmt_date(d),
             "date_iso": d.isoformat(),
+            "updated_iso": (upd or d).isoformat(),
             "description": meta.get("description", ""),
             "cover": cover,
             "cover_alt": meta.get("cover_alt", meta.get("title", "")),
@@ -163,17 +167,24 @@ def main():
     render("index.html", "index.html", posts=posts[:4],
            page={"url": "/", "title": None, "description": site["description"]})
     render("blog.html", "blog/index.html", posts=posts, all_tags=all_tags,
-           page={"url": "/blog/", "title": "Blog", "description": "Tüm yazılar — " + site["title"]})
+           page={"url": "/blog/", "title": "Blog",
+                 "description": "Mobil geliştirme, uygulama güvenliği ve CI/CD üzerine yazdıklarım — "
+                                "Android, Kotlin, Flutter ve GitLab deneyimlerimden çıkan notlar."})
     for p in posts:
         render("post.html", f"blog/{p['slug']}/index.html", post=p,
                page={"url": p["url"], "title": p["title"], "description": p["description"],
-                     "type": "article", "date_iso": p["date_iso"], "tags": p["tags"],
+                     "type": "article", "date_iso": p["date_iso"],
+                     "modified_iso": p["updated_iso"], "tags": p["tags"],
                      "image": p["cover"], "image_alt": p["cover_alt"],
                      "image_w": p["cover_w"], "image_h": p["cover_h"]})
     render("hakkimda.html", "hakkimda/index.html",
-           page={"url": "/hakkimda/", "title": "Hakkımda", "description": "Murat Arslan kimdir?"})
+           page={"url": "/hakkimda/", "title": "Hakkımda",
+                 "description": "Murat Arslan kimdir? Beş yılı aşkın süredir Android ve Flutter ile mobil "
+                                "uygulama geliştiren bir yazılımcının deneyimi, uzmanlık ve ilgi alanları."})
     render("projeler.html", "projeler/index.html",
-           page={"url": "/projeler/", "title": "Projeler", "description": "Geliştirdiğim projeler"})
+           page={"url": "/projeler/", "title": "Projeler",
+                 "description": "Geliştirdiğim projeler: Flutter ile kurduğum Hanio, markdown tabanlı bu "
+                                "statik site ve CPU üzerinde çalışan niyet tespiti modeli."})
     render("404.html", "404.html",
            page={"url": "/404", "title": "Sayfa bulunamadı", "description": "404", "noindex": True})
 
@@ -202,13 +213,16 @@ def main():
     (DIST / "rss.xml").write_text(rss, encoding="utf-8")
 
     # --- Sitemap (lastmod destekli) ---
-    latest = posts[0]["date_iso"] if posts else date.today().isoformat()
-    entries = [("/", latest), ("/blog/", latest), ("/hakkimda/", latest),
-               ("/projeler/", latest)] + [(p["url"], p["date_iso"]) for p in posts]
+    # / ve /blog/ yeni yazi geldikce degisiyor; hakkimda ve projeler icin
+    # guvenilir bir tarih yok, lastmod yazmak yerine hic yazmiyoruz.
+    latest = max((p["updated_iso"] for p in posts), default=date.today().isoformat())
+    entries = [("/", latest), ("/blog/", latest), ("/hakkimda/", None),
+               ("/projeler/", None)] + [(p["url"], p["updated_iso"]) for p in posts]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, lm in entries:
-        sm.append(f"  <url><loc>{site['url']}{u}</loc><lastmod>{lm}</lastmod></url>")
+        mod = f"<lastmod>{lm}</lastmod>" if lm else ""
+        sm.append(f"  <url><loc>{site['url']}{u}</loc>{mod}</url>")
     sm.append("</urlset>")
     (DIST / "sitemap.xml").write_text("\n".join(sm), encoding="utf-8")
 

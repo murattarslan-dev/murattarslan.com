@@ -6,6 +6,8 @@
   <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }} — {{ site.tagline }}{% endif %}</title>
   <meta name="description" content="{{ page.description }}">
   <meta name="author" content="{{ site.author }}">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F7F5F1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101013">
   <link rel="canonical" href="{{ site.url }}{{ page.url }}">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
@@ -34,14 +36,15 @@
   {% if page.noindex %}<meta name="robots" content="noindex">{% endif %}
   {% if page.type == 'article' %}
   <meta property="article:published_time" content="{{ page.date_iso }}">
+  <meta property="article:modified_time" content="{{ page.modified_iso | default(page.date_iso, true) }}">
   <meta property="article:author" content="{{ site.author }}">
   {% for t in page.tags %}<meta property="article:tag" content="{{ t }}">
   {% endfor %}
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"BlogPosting","headline":"{{ page.title }}","datePublished":"{{ page.date_iso }}","dateModified":"{{ page.date_iso }}","inLanguage":"tr-TR","image":"{{ site.url }}{{ share_image }}","author":{"@type":"Person","name":"{{ site.author }}","url":"{{ site.url }}"},"publisher":{"@type":"Person","name":"{{ site.author }}","url":"{{ site.url }}"},"description":"{{ page.description }}","keywords":"{{ page.tags | join(', ') }}","mainEntityOfPage":{"@type":"WebPage","@id":"{{ site.url }}{{ page.url }}"}}
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":{{ page.title | tojson }},"datePublished":"{{ page.date_iso }}","dateModified":"{{ page.modified_iso | default(page.date_iso, true) }}","inLanguage":"tr-TR","image":"{{ site.url }}{{ share_image }}","author":{"@type":"Person","name":{{ site.author | tojson }},"url":"{{ site.url }}","sameAs":[{{ site.social.github | tojson }},{{ site.social.linkedin | tojson }}]},"publisher":{"@type":"Person","name":{{ site.author | tojson }},"url":"{{ site.url }}"},"description":{{ page.description | tojson }},"keywords":{{ page.tags | join(', ') | tojson }},"mainEntityOfPage":{"@type":"WebPage","@id":"{{ site.url }}{{ page.url }}"}}
   </script>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Ana sayfa","item":"{{ site.url }}/"},{"@type":"ListItem","position":2,"name":"Blog","item":"{{ site.url }}/blog/"},{"@type":"ListItem","position":3,"name":"{{ page.title }}","item":"{{ site.url }}{{ page.url }}"}]}
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Ana sayfa","item":"{{ site.url }}/"},{"@type":"ListItem","position":2,"name":"Blog","item":"{{ site.url }}/blog/"},{"@type":"ListItem","position":3,"name":{{ page.title | tojson }},"item":"{{ site.url }}{{ page.url }}"}]}
   </script>
   {% else %}
   <script type="application/ld+json">
@@ -50,7 +53,12 @@
   {% endif %}
   {% if page.url == '/' %}
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebSite","name":"{{ site.title }}","url":"{{ site.url }}","description":"{{ site.description }}","inLanguage":"tr-TR","publisher":{"@type":"Person","name":"{{ site.author }}"}}
+  {"@context":"https://schema.org","@type":"WebSite","name":{{ site.title | tojson }},"url":"{{ site.url }}","description":{{ site.description | tojson }},"inLanguage":"tr-TR","publisher":{"@type":"Person","name":{{ site.author | tojson }}}}
+  </script>
+  {% endif %}
+  {% if page.url == '/blog/' %}
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Blog","name":{{ (site.title ~ ' — Blog') | tojson }},"url":"{{ site.url }}/blog/","description":{{ page.description | tojson }},"inLanguage":"tr-TR","author":{"@type":"Person","name":{{ site.author | tojson }},"url":"{{ site.url }}"},"blogPost":[{% for p in posts %}{"@type":"BlogPosting","headline":{{ p.title | tojson }},"url":"{{ site.url }}{{ p.url }}","datePublished":"{{ p.date_iso }}","dateModified":"{{ p.updated_iso }}","description":{{ p.description | tojson }},"keywords":{{ p.tags | join(', ') | tojson }}}{{ "," if not loop.last }}{% endfor %}]}
   </script>
   {% endif %}
 
