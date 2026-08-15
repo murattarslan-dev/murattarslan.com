@@ -22,8 +22,8 @@
   {% set share_image_alt = page.image_alt | default('', true) or (site.title ~ ' — ' ~ site.tagline) %}
   <meta property="og:image" content="{{ site.url }}{{ share_image }}">
   <meta property="og:image:type" content="{% if share_image.endswith('.jpg') %}image/jpeg{% else %}image/png{% endif %}">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  <meta property="og:image:width" content="{{ page.image_w | default(1200, true) }}">
+  <meta property="og:image:height" content="{{ page.image_h | default(630, true) }}">
   <meta property="og:image:alt" content="{{ share_image_alt }}">
   <meta property="og:locale" content="tr_TR">
   <meta name="twitter:card" content="summary_large_image">

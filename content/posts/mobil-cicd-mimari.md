@@ -3,6 +3,8 @@ title: "Mobil CI/CD: kurduğum mimari ve verdiğim kararlar"
 slug: mobil-cicd-mimari
 date: 2026-08-15
 description: "Mobil projelerde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master'dan çıkar?"
+cover: /assets/covers/mobil-cicd-mimari.jpg
+cover_alt: "GitLab CI/CD akışı: CI değişken yönetimi ve erişim kontrolü, build / security scan / static analysis adımları ve merge'den prod dağıtımına uzanan pipeline"
 tags: [ci-cd, gitlab, mobil]
 ---
 

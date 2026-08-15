@@ -16,6 +16,7 @@ Yazı eklemek için content/posts/ altına front matter'lı bir .md dosyası koy
 """
 import re
 import shutil
+import struct
 import html as htmllib
 from datetime import datetime, date
 from pathlib import Path
@@ -67,6 +68,40 @@ def md_render(text: str) -> str:
     )
 
 
+def image_size(url_path: str):
+    """/assets/... yolundaki PNG veya JPEG'in (genislik, yukseklik) degerini dondurur.
+
+    Ek bagimlilik istemedigimiz icin dosya basligini elle okuyoruz.
+    Olcu cikarilamazsa None doner; sablon o zaman olcu yazmaz.
+    """
+    if not url_path.startswith("/assets/"):
+        return None
+    f = STATIC / url_path[len("/assets/"):]
+    if not f.is_file():
+        return None
+    d = f.read_bytes()
+    if d[:8] == b"\x89PNG\r\n\x1a\n":
+        return struct.unpack(">II", d[16:24])
+    if d[:2] == b"\xff\xd8":  # JPEG: SOFn markerini bul
+        i = 2
+        while i + 9 < len(d):
+            if d[i] != 0xFF:
+                i += 1
+                continue
+            marker = d[i + 1]
+            if marker == 0xD8 or marker == 0x01 or 0xD0 <= marker <= 0xD7:
+                i += 2
+                continue
+            if marker == 0xD9:
+                break
+            seg = struct.unpack(">H", d[i + 2:i + 4])[0]
+            if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+                h, w = struct.unpack(">HH", d[i + 5:i + 9])
+                return w, h
+            i += 2 + seg
+    return None
+
+
 def reading_time(text: str) -> int:
     words = len(re.findall(r"\w+", text))
     return max(1, round(words / 200))
@@ -78,6 +113,8 @@ def load_posts():
         meta, body = parse_front_matter(f.read_text(encoding="utf-8"))
         if meta.get("draft"):
             continue
+        cover = meta.get("cover", "")
+        cover_size = image_size(cover) if cover else None
         d = meta.get("date", date.today())
         if isinstance(d, str):
             d = datetime.strptime(d, "%Y-%m-%d").date()
@@ -88,8 +125,10 @@ def load_posts():
             "date_h": fmt_date(d),
             "date_iso": d.isoformat(),
             "description": meta.get("description", ""),
-            "cover": meta.get("cover", ""),
+            "cover": cover,
             "cover_alt": meta.get("cover_alt", meta.get("title", "")),
+            "cover_w": cover_size[0] if cover_size else None,
+            "cover_h": cover_size[1] if cover_size else None,
             "tags": meta.get("tags", []),
             "slug": slug,
             "url": f"/blog/{slug}/",
@@ -129,7 +168,8 @@ def main():
         render("post.html", f"blog/{p['slug']}/index.html", post=p,
                page={"url": p["url"], "title": p["title"], "description": p["description"],
                      "type": "article", "date_iso": p["date_iso"], "tags": p["tags"],
-                     "image": p["cover"], "image_alt": p["cover_alt"]})
+                     "image": p["cover"], "image_alt": p["cover_alt"],
+                     "image_w": p["cover_w"], "image_h": p["cover_h"]})
     render("hakkimda.html", "hakkimda/index.html",
            page={"url": "/hakkimda/", "title": "Hakkımda", "description": "Murat Arslan kimdir?"})
     render("projeler.html", "projeler/index.html",
