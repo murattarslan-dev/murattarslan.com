@@ -87,7 +87,7 @@
   </figure>
   
   <header class="post-head has-cover">
-    <div class="card-meta"><time datetime="2026-08-15">15 Ağustos 2026</time> · 4 dk okuma</div>
+    <div class="card-meta"><time datetime="2026-08-15">15 Ağustos 2026</time> · 5 dk okuma</div>
     <h1>Mobil CI/CD: kurduğum mimari ve verdiğim kararlar</h1>
     <div class="tags"><span class="tag">#ci-cd</span><span class="tag">#gitlab</span><span class="tag">#mobil</span></div>
   </header>
@@ -131,6 +131,13 @@
 <li>&ldquo;Dev uygulamada testi kolaylaştıran araçlar yok.&rdquo;</li>
 </ul>
 <p>İkisi de aynı kök sorundan çıkıyor: hangi yapının hangi ortama ait olduğunun build anında değil, sonradan elle belirlenmesi. Argümanı dağıtım aşamasında verdiğim için, çıkan paket kendi kimliğini taşıyor. Ortam bazlı yapılandırmayı ve hangi sırrın hangi ortamda görünür olduğunu ayrı bir yazıda daha detaylı anlatacağım.</p>
+<h2 id="karar-6-ios-buildi-kendi-macimde-kosan-bir-runner-alr">Karar 6: iOS build&rsquo;i kendi Mac&rsquo;imde koşan bir runner alır</h2>
+<p>Buraya kadar anlattığım her şeyin altında sessiz bir varsayım var: pipeline&rsquo;ın koşacağı bir makine. Android tarafında bu bir sorun değil, şirket sunucuları Linux tabanlı ve iş görüyor. Ama iOS build&rsquo;i macOS istiyor ve elimizde macOS koşan bir sunucu yok.</p>
+<p>Seçenek ikiye iniyordu: bulutta bir macOS runner kiralamak ya da mevcut bir Mac&rsquo;i runner&rsquo;a dönüştürmek. İkincisini seçtim ve kendi cihazıma bir GitLab runner kurdum.</p>
+<p>Runner&rsquo;ı doğrudan makinenin üzerinde çalıştırmak istemedim. Bunun yerine <strong>Tart</strong> ile oluşturduğum, RAM ve CPU sınırları tanımlı bir sanal makinenin içinde koşuyor. İki kazancı var: pipeline gün içinde kullandığım makinenin kaynaklarını sömürmüyor ve build ortamı lokalimden yalıtılmış oluyor. Yani build, benim makinemde çalışıyor ama benim kurulumumla çalışmıyor.</p>
+<p>Sonuçta commit attığımda GitLab yine gelip benim cihazımda build alıyor ve uygulamayı dağıtıyor. Akışın geri kalanı — testler, kurallar, sırlar — hiç değişmiyor; değişen tek şey o adımın nerede koştuğu.</p>
+<p>Bu yapının bugünkü hâlinde açık bir zayıflık var: tek cihaz. Makinem kapalıysa iOS build&rsquo;i de yok. Bu yüzden sıradaki adım aynı runner&rsquo;ı birkaç Mac&rsquo;te daha kurmak; hem yük dağılacak hem de cihazlardan biri kapalıyken pipeline çalışmaya devam edecek.</p>
+<p>Bunu bir eksik olarak yazmam tesadüf değil. Yazının başında reddettiğim şey buydu zaten: tek bir kişinin makinesinde duran bağımlılık. Sır olarak kabul edilemez olan şey, donanım olarak da kabul edilemez.</p>
 <h2 id="sonuc">Sonuç</h2>
 <p>Kurduğum yapının özeti tek cümleyle şu: <strong>sırlar projenin kendisinde durur, kurallar pipeline&rsquo;da yazar, sürümün kimliği build anında belirlenir.</strong></p>
 <p>Bu üçü oturduktan sonra sürüm vermek yarım saatlik bir iş olmaktan çıkıp bir butona basmaya dönüştü. Asıl kazanç kazanılan yarım saat de değil bence — sürüm vermenin artık dikkat gerektiren bir iş olmaması.</p>

@@ -75,6 +75,20 @@ Bunun çözdüğü iki klasik sorun var:
 
 İkisi de aynı kök sorundan çıkıyor: hangi yapının hangi ortama ait olduğunun build anında değil, sonradan elle belirlenmesi. Argümanı dağıtım aşamasında verdiğim için, çıkan paket kendi kimliğini taşıyor. Ortam bazlı yapılandırmayı ve hangi sırrın hangi ortamda görünür olduğunu ayrı bir yazıda daha detaylı anlatacağım.
 
+## Karar 6: iOS build'i kendi Mac'imde koşan bir runner alır
+
+Buraya kadar anlattığım her şeyin altında sessiz bir varsayım var: pipeline'ın koşacağı bir makine. Android tarafında bu bir sorun değil, şirket sunucuları Linux tabanlı ve iş görüyor. Ama iOS build'i macOS istiyor ve elimizde macOS koşan bir sunucu yok.
+
+Seçenek ikiye iniyordu: bulutta bir macOS runner kiralamak ya da mevcut bir Mac'i runner'a dönüştürmek. İkincisini seçtim ve kendi cihazıma bir GitLab runner kurdum.
+
+Runner'ı doğrudan makinenin üzerinde çalıştırmak istemedim. Bunun yerine **Tart** ile oluşturduğum, RAM ve CPU sınırları tanımlı bir sanal makinenin içinde koşuyor. İki kazancı var: pipeline gün içinde kullandığım makinenin kaynaklarını sömürmüyor ve build ortamı lokalimden yalıtılmış oluyor. Yani build, benim makinemde çalışıyor ama benim kurulumumla çalışmıyor.
+
+Sonuçta commit attığımda GitLab yine gelip benim cihazımda build alıyor ve uygulamayı dağıtıyor. Akışın geri kalanı — testler, kurallar, sırlar — hiç değişmiyor; değişen tek şey o adımın nerede koştuğu.
+
+Bu yapının bugünkü hâlinde açık bir zayıflık var: tek cihaz. Makinem kapalıysa iOS build'i de yok. Bu yüzden sıradaki adım aynı runner'ı birkaç Mac'te daha kurmak; hem yük dağılacak hem de cihazlardan biri kapalıyken pipeline çalışmaya devam edecek.
+
+Bunu bir eksik olarak yazmam tesadüf değil. Yazının başında reddettiğim şey buydu zaten: tek bir kişinin makinesinde duran bağımlılık. Sır olarak kabul edilemez olan şey, donanım olarak da kabul edilemez.
+
 ## Sonuç
 
 Kurduğum yapının özeti tek cümleyle şu: **sırlar projenin kendisinde durur, kurallar pipeline'da yazar, sürümün kimliği build anında belirlenir.**
