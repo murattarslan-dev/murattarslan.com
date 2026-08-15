@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flutter CI/CD: kurduğum mimari ve verdiğim kararlar · Murat Arslan</title>
+  <meta name="description" content="Flutter projemde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master'dan çıkar?">
+  <meta name="author" content="Murat Arslan">
+  <link rel="canonical" href="https://www.murattarslan.com/blog/flutter-cicd-mimari/">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Murat Arslan" href="/rss.xml">
+
+  <meta property="og:site_name" content="Murat Arslan">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Flutter CI/CD: kurduğum mimari ve verdiğim kararlar">
+  <meta property="og:description" content="Flutter projemde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master'dan çıkar?">
+  <meta property="og:url" content="https://www.murattarslan.com/blog/flutter-cicd-mimari/">
+  
+  
+  <meta property="og:image" content="https://www.murattarslan.com/assets/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Flutter CI/CD: kurduğum mimari ve verdiğim kararlar">
+  <meta property="og:locale" content="tr_TR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Flutter CI/CD: kurduğum mimari ve verdiğim kararlar">
+  <meta name="twitter:description" content="Flutter projemde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master'dan çıkar?">
+  <meta name="twitter:image" content="https://www.murattarslan.com/assets/og.png">
+  <meta name="twitter:image:alt" content="Flutter CI/CD: kurduğum mimari ve verdiğim kararlar">
+  
+  
+  <meta property="article:published_time" content="2026-08-15">
+  <meta property="article:author" content="Murat Arslan">
+  <meta property="article:tag" content="flutter">
+  <meta property="article:tag" content="ci-cd">
+  <meta property="article:tag" content="gitlab">
+  
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Flutter CI/CD: kurduğum mimari ve verdiğim kararlar","datePublished":"2026-08-15","dateModified":"2026-08-15","inLanguage":"tr-TR","image":"https://www.murattarslan.com/assets/og.png","author":{"@type":"Person","name":"Murat Arslan","url":"https://www.murattarslan.com"},"publisher":{"@type":"Person","name":"Murat Arslan","url":"https://www.murattarslan.com"},"description":"Flutter projemde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master'dan çıkar?","keywords":"flutter, ci-cd, gitlab","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.murattarslan.com/blog/flutter-cicd-mimari/"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Ana sayfa","item":"https://www.murattarslan.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://www.murattarslan.com/blog/"},{"@type":"ListItem","position":3,"name":"Flutter CI/CD: kurduğum mimari ve verdiğim kararlar","item":"https://www.murattarslan.com/blog/flutter-cicd-mimari/"}]}
+  </script>
+  
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script>
+    (function(){
+      var t = null;
+      try { t = localStorage.getItem('theme'); } catch(e) {}
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header class="nav-wrap">
+    <nav class="nav container">
+      <a class="logo" href="/">MA<span class="logo-dot">.</span></a>
+      <div class="nav-links">
+        <a href="/blog/">Blog</a>
+        <a href="/projeler/">Projeler</a>
+        <a href="/hakkimda/">Hakkımda</a>
+        <button id="theme-toggle" aria-label="Tema değiştir" title="Tema değiştir">
+          <svg class="sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
+          <svg class="moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+  
+<article class="post">
+  
+  <header class="post-head">
+    <div class="card-meta"><time datetime="2026-08-15">15 Ağustos 2026</time> · 4 dk okuma</div>
+    <h1>Flutter CI/CD: kurduğum mimari ve verdiğim kararlar</h1>
+    <div class="tags"><span class="tag">#flutter</span><span class="tag">#ci-cd</span><span class="tag">#gitlab</span></div>
+  </header>
+  <div class="prose">
+    <p>Her ürünün geliştirme aşamasında değişmeyen bir avuç süreç vardır. Test ve dağıtım da bunların başında gelir. Commit sonrası unit testleri çalıştıran, bir hata varsa sürüm çıkmadan haber veren bir yapıya ihtiyacınız var. Sonra uygulamanın derlenmesi, imzalanması, dağıtılması, dağıtım sonrası testçilere haber verilmesi&hellip; Süreç gerçekten uzun ve külfetli.</p>
+<p>İşin kötü tarafı şu: elinizin altında bir süper bilgisayar yoksa bu sadece efor değil, aynı zamanda vakit kaybı. Benim bir Android uygulamaya sürüm vermem yarım saatimi alıyordu. CI ile bu süre bana göre sıfıra iniyor. Pipeline tıkır tıkır işlerken unit testleri çalıştırıyor, build alıp imzalıyor, uygulamayı dağıtıyor ve dağıtırken mesajı bile ekliyor.</p>
+<p>Bu yazı bir tutorial değil. Kurduğum yapıyı ve o yapıya gelirken verdiğim kararları anlatıyorum. &ldquo;Nasıl yapılır&rdquo; kısımlarını platform platform ayrı yazılara bırakıyorum; ilgili yerlerde belirteceğim.</p>
+<h2 id="temel-soru-neye-guveniyoruz">Temel soru: neye güveniyoruz?</h2>
+<p>Sır yönetimi konusunda okuduğum her şey bana aynı noktayı gösterdi: önce şu soruyu cevaplamak gerekiyor. Bu akışta kime, neye güveniyoruz?</p>
+<p>Benim cevabım şöyle oldu:</p>
+<ul>
+<li><strong>Repoya güvenmiyoruz.</strong> Repo herkese açıktır — en azından ekipteki herkese. Ve repo geçmişi kalıcıdır.</li>
+<li><strong>Geliştiricinin lokaline güvenmiyoruz.</strong> Lokal makine kaybolur, formatlanır, işten ayrılan kişiyle birlikte gider.</li>
+<li><strong>GitLab&rsquo;ın erişim kontrolüne güveniyoruz.</strong> Zaten koda erişimi orada yönetiyoruz; sırları da aynı yerde yönetmek fazladan bir güven varsayımı eklemiyor.</li>
+</ul>
+<p>Aşağıdaki kararların hepsi bu üç maddeden çıktı.</p>
+<h2 id="karar-1-imza-bilgileri-env-degerleri-ve-google-services-dosyalar-repoda-durmaz">Karar 1: İmza bilgileri, env değerleri ve google-services dosyaları repoda durmaz</h2>
+<p>Özellikle kurumsal ürünlerde ekip sürekli değişir ve bu değişime hazır olmak gerekir. Mevcut geliştirici işten ayrılıp yerine bir başkası geldiğinde akışta hiçbir aksaklık olmamalı.</p>
+<p>&ldquo;JKS dosyası kayboldu, önceki geliştiricinin lokalinde kalmış ve silinmiş&rdquo; cümlesi gerçek bir kâbus. Bu cümlenin kurulabildiği her yapı zaten hatalıdır.</p>
+<p>Bunun yerine hem dev hem prod sürümler dağıtılırken imzalama CI variables üzerinden yapılıyor. JKS dosyası hiçbir zaman geliştiricinin lokaline inmiyor; dolayısıyla orada kalması da mümkün değil. API key&rsquo;lerin bulunduğu env dosyası ve dev konfigürasyonları da aynı şekilde CI variables içinden alınıyor.</p>
+<p>Buradaki asıl kazanç güvenlik değil bence — süreklilik. Sır tek bir kişinin diskinde değil, projenin kendisinde duruyor.</p>
+<h2 id="karar-2-dosyalar-base64leyip-variablea-gommek-yerine-package-registry">Karar 2: Dosyaları base64&rsquo;leyip variable&rsquo;a gömmek yerine Package Registry</h2>
+<p>Sır yönetiminde en yaygın çözüm dosyayı base64&rsquo;leyip bir CI variable&rsquo;ın içine koymak. İşe yarıyor, ama tek yönlü bir çözüm: pipeline o dosyaya ulaşabiliyor, geliştirici ulaşamıyor.</p>
+<p>Oysa geliştiricinin de zaman zaman o dosyalara ihtiyacı oluyor. Bu yüzden dosyaları GitLab Package Registry içinde tuttum. Böylece ihtiyacı olan geliştirici, ihtiyacı olan dosyayı rahatlıkla alabiliyor — ve bunu bir başkasına &ldquo;şu dosyayı bana atar mısın&rdquo; diye yazmadan, kayıt altında olan bir yerden yapıyor.</p>
+<p>Kabaca ayrım şu hâle geldi: <strong>küçük ve metinsel olan sırlar CI variables&rsquo;ta, dosya olanlar Package Registry&rsquo;de.</strong> Keystore&rsquo;u registry&rsquo;ye koyup pipeline içinde nasıl çektiğimi, Android imzalamayı anlattığım ayrı bir yazıda adım adım göstereceğim.</p>
+<h2 id="karar-3-her-commit-test-eder-ama-mergei-insan-baslatr">Karar 3: Her commit test eder, ama merge&rsquo;i insan başlatır</h2>
+<p>CI dosyasını şu şekilde organize ettim:</p>
+<p>Her branch için geçerli olmak üzere, commit sonrası unit testler otomatik çalışıyor. Bir sorun varsa commit&rsquo;i atan kişiye mail gidiyor. Sorun yoksa merge request aşamasına geçiliyor.</p>
+<p>Bu kısım şimdilik manuel. Çünkü commit atmak, geliştirmenin bittiği anlamına gelmiyor. Gün içinde defalarca commit atıyorum ve bunların çoğu &ldquo;bu iş bitti&rdquo; demek değil, &ldquo;bu ara kaydı kaybetmeyeyim&rdquo; demek. Merge&rsquo;i otomatikleştirmek, bu ikisini birbirine karıştırmak olurdu.</p>
+<p>Bir tag yardımıyla bu kısmı da otomatikleştirmek mümkün. İleride yapabilirim. Şu an bilinçli olarak yapmıyorum — bu, çözemediğim bir eksik değil, ertelediğim bir karar.</p>
+<p>Yazıyı yazarken fark ettim ki tag&rsquo;li otomatikleştirmeyi hiç denememişim bile. Bu seri bittiğinde bir bakacağım.</p>
+<h2 id="karar-4-prod-sadece-masterdan-ckar">Karar 4: Prod sadece master&rsquo;dan çıkar</h2>
+<p>Geliştirici sürüm vermek istediğinde, unit testi geçmiş bir pipeline&rsquo;ın içinden hem iOS hem Android dağıtımını başlatabiliyor. İki platformun akışı dışarıdan aynı görünse de içeride hiç aynı değil; iOS tarafındaki sertifika ve provisioning profile işi kendi başına bir yazı konusu, onu ayrıca ele alacağım.</p>
+<p>CI dosyasına koyduğum bir koşul sayesinde prod sürüm yalnızca master branch üzerinden dağıtılabiliyor. Bu tek satırlık koşul, &ldquo;yanlışlıkla feature branch&rsquo;ten prod çıkmak&rdquo; diye bir olasılığı tamamen ortadan kaldırıyor.</p>
+<p>Bu tip kuralları dokümana yazmak yerine pipeline&rsquo;a yazmayı tercih ediyorum. Dokümandaki kural hatırlanmayı bekler; pipeline&rsquo;daki kural kendini uygular.</p>
+<h2 id="karar-5-dev-surum-dev-oldugunu-bilir">Karar 5: Dev sürüm, dev olduğunu bilir</h2>
+<p>Dev dağıtımı sırasında uygulamaya env üzerinden <code>type=Dev</code> argümanını geçiyorum. Uygulama bu argümanı görünce testçi arkadaşların işini kolaylaştıracak araçları aktif ediyor.</p>
+<p>Bunun çözdüğü iki klasik sorun var:</p>
+<ul>
+<li>&ldquo;Prod&rsquo;a dev API ile çıkmışız.&rdquo;</li>
+<li>&ldquo;Dev uygulamada testi kolaylaştıran araçlar yok.&rdquo;</li>
+</ul>
+<p>İkisi de aynı kök sorundan çıkıyor: hangi yapının hangi ortama ait olduğunun build anında değil, sonradan elle belirlenmesi. Argümanı dağıtım aşamasında verdiğim için, çıkan paket kendi kimliğini taşıyor. Ortam bazlı yapılandırmayı ve hangi sırrın hangi ortamda görünür olduğunu ayrı bir yazıda daha detaylı anlatacağım.</p>
+<h2 id="sonuc">Sonuç</h2>
+<p>Kurduğum yapının özeti tek cümleyle şu: <strong>sırlar projenin kendisinde durur, kurallar pipeline&rsquo;da yazar, sürümün kimliği build anında belirlenir.</strong></p>
+<p>Bu üçü oturduktan sonra sürüm vermek yarım saatlik bir iş olmaktan çıkıp bir butona basmaya dönüştü. Asıl kazanç kazanılan yarım saat de değil bence — sürüm vermenin artık dikkat gerektiren bir iş olmaması.</p>
+  </div>
+  
+  <div class="post-share">
+    <span class="post-share-label">Bu yazıyı paylaş</span>
+    <div class="share-actions">
+      <a class="share-btn" href="https://x.com/intent/tweet?text=Flutter%20CI/CD%3A%20kurdu%C4%9Fum%20mimari%20ve%20verdi%C4%9Fim%20kararlar&amp;url=https%3A//www.murattarslan.com/blog/flutter-cicd-mimari/"
+         target="_blank" rel="noopener" aria-label="X'te paylaş" title="X'te paylaş">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.63l-5.2-6.8-5.94 6.8H1.73l7.49-8.57L1.06 2.25h6.8l4.71 6.22 5.67-6.22Zm-1.16 17.52h1.83L7.09 4.13H5.13l11.95 15.64Z"/></svg>
+      </a>
+      <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//www.murattarslan.com/blog/flutter-cicd-mimari/"
+         target="_blank" rel="noopener" aria-label="LinkedIn'de paylaş" title="LinkedIn'de paylaş">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+      </a>
+      <a class="share-btn" href="https://wa.me/?text=Flutter%20CI/CD%3A%20kurdu%C4%9Fum%20mimari%20ve%20verdi%C4%9Fim%20kararlar%20https%3A//www.murattarslan.com/blog/flutter-cicd-mimari/"
+         target="_blank" rel="noopener" aria-label="WhatsApp'ta paylaş" title="WhatsApp'ta paylaş">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.87 9.87 0 0 0 4.78 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.13h-.01a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.11.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.36c0-4.53 3.69-8.22 8.23-8.22 2.2 0 4.26.86 5.81 2.41a8.16 8.16 0 0 1 2.41 5.82c0 4.54-3.69 8.21-8.23 8.21z"/><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.13-.42-2.15-1.33-.8-.71-1.33-1.59-1.49-1.89-.15-.3-.02-.46.13-.61.15-.15.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.46 0 1.45 1.06 2.85 1.21 3.05.15.2 2.05 3.13 4.96 4.27 2.42.95 2.91.76 3.44.71.52-.05 1.69-.69 1.93-1.36.24-.67.24-1.24.17-1.36-.07-.12-.27-.19-.57-.34z"/></svg>
+      </a>
+      <button class="share-btn" id="copy-link" type="button" data-url="https://www.murattarslan.com/blog/flutter-cicd-mimari/"
+              aria-label="Bağlantıyı kopyala" title="Bağlantıyı kopyala">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9.7 14.3l4.6-4.6"/><path d="M11.6 7.6l1.7-1.7a3.7 3.7 0 0 1 5.2 5.2l-1.7 1.7"/><path d="M12.4 16.4l-1.7 1.7a3.7 3.7 0 0 1-5.2-5.2l1.7-1.7"/></svg>
+        <span class="copied-tip" aria-hidden="true">Kopyalandı</span>
+      </button>
+    </div>
+  </div>
+
+  <footer class="post-footer">
+    <a class="btn btn-ghost" href="/blog/">← Tüm yazılar</a>
+    <p class="post-cta">Sorusu ya da yorumu olan: <a href="mailto:murattarslan.dev@gmail.com">murattarslan.dev@gmail.com</a> 📮</p>
+  </footer>
+</article>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© 2026 Murat Arslan · <a href="/rss.xml">RSS</a></p>
+      <div class="footer-social">
+        <a href="https://github.com/murattarslan-dev" rel="me noopener" target="_blank" aria-label="GitHub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11.1 11.1 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/murattarslan" rel="me noopener" target="_blank" aria-label="LinkedIn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+        </a>
+        <a href="mailto:murattarslan.dev@gmail.com" aria-label="E-posta">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('theme-toggle').addEventListener('click', function(){
+      var dark = document.documentElement.classList.toggle('dark');
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch(e) {}
+    });
+
+    var copyBtn = document.getElementById('copy-link');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function(){
+        var url = copyBtn.getAttribute('data-url') || location.href;
+        var done = function(){
+          copyBtn.classList.add('copied');
+          setTimeout(function(){ copyBtn.classList.remove('copied'); }, 1800);
+        };
+        var fallback = function(){
+          var ta = document.createElement('textarea');
+          ta.value = url; ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); done(); } catch(e) {}
+          document.body.removeChild(ta);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(done, fallback);
+        } else {
+          fallback();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
