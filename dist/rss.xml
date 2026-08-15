@@ -7,11 +7,11 @@
   <description>Murat Arslan — Software Developer. Yazılım, mobil geliştirme ve teknoloji üzerine blog.</description>
   <language>tr</language>
   <item>
-    <title>Flutter CI/CD: kurduğum mimari ve verdiğim kararlar</title>
-    <link>https://www.murattarslan.com/blog/flutter-cicd-mimari/</link>
-    <guid>https://www.murattarslan.com/blog/flutter-cicd-mimari/</guid>
+    <title>Mobil CI/CD: kurduğum mimari ve verdiğim kararlar</title>
+    <link>https://www.murattarslan.com/blog/mobil-cicd-mimari/</link>
+    <guid>https://www.murattarslan.com/blog/mobil-cicd-mimari/</guid>
     <pubDate>Sat, 15 Aug 2026 09:00:00 +0300</pubDate>
-    <description>Flutter projemde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master&#x27;dan çıkar?</description>
+    <description>Mobil projelerde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master&#x27;dan çıkar?</description>
   </item>
   <item>
     <title>Android&#x27;de SSL pinning: pratikte neye yarar, neyi kırar</title>

@@ -1,9 +1,9 @@
 ---
-title: "Flutter CI/CD: kurduğum mimari ve verdiğim kararlar"
-slug: flutter-cicd-mimari
+title: "Mobil CI/CD: kurduğum mimari ve verdiğim kararlar"
+slug: mobil-cicd-mimari
 date: 2026-08-15
-description: "Flutter projemde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master'dan çıkar?"
-tags: [flutter, ci-cd, gitlab]
+description: "Mobil projelerde kurduğum CI/CD yapısı ve arkasındaki kararlar: sırlar neden repoda durmaz, hangi sır nerede saklanır, prod neden sadece master'dan çıkar?"
+tags: [ci-cd, gitlab, mobil]
 ---
 
 Her ürünün geliştirme aşamasında değişmeyen bir avuç süreç vardır. Test ve dağıtım da bunların başında gelir. Commit sonrası unit testleri çalıştıran, bir hata varsa sürüm çıkmadan haber veren bir yapıya ihtiyacınız var. Sonra uygulamanın derlenmesi, imzalanması, dağıtılması, dağıtım sonrası testçilere haber verilmesi... Süreç gerçekten uzun ve külfetli.
